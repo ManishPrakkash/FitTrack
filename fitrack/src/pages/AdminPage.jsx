@@ -26,9 +26,17 @@
 
       useEffect(() => {
         // Get user data from localStorage
-        const userData = localStorage.getItem('fittrack_user');
+        const userData = localStorage.getItem('fitrack_user');
         if (userData) {
-          setUser(JSON.parse(userData));
+          try {
+            const parsedUser = JSON.parse(userData);
+            console.log('User data found in AdminPage:', parsedUser);
+            setUser(parsedUser);
+          } catch (err) {
+            console.error('Error parsing user data:', err);
+          }
+        } else {
+          console.log('No user data found in localStorage');
         }
 
         // Fetch challenges from the backend
@@ -37,6 +45,46 @@
 
       const fetchChallenges = async () => {
         setIsLoading(true);
+
+        // Use mock data for now
+        setTimeout(() => {
+          const mockChallenges = [
+            {
+              id: '1',
+              name: 'Morning Mile Run',
+              type: 'Running',
+              description: 'Run 1 mile every morning for 30 days.',
+              goal: 30,
+              unit: 'miles',
+              created_by: '123456'
+            },
+            {
+              id: '2',
+              name: '10k Steps Daily',
+              type: 'Walking',
+              description: 'Achieve 10,000 steps every day for a month.',
+              goal: 300000,
+              unit: 'steps',
+              created_by: '123456'
+            },
+            {
+              id: '3',
+              name: 'Cycle 100km Weekly',
+              type: 'Cycling',
+              description: 'Cycle a total of 100km each week for 4 weeks.',
+              goal: 400,
+              unit: 'km',
+              created_by: '123456'
+            }
+          ];
+
+          setChallenges(mockChallenges);
+          setIsLoading(false);
+        }, 500);
+
+        // The code below is the original implementation
+        // Uncomment when the backend is properly set up
+        /*
         try {
           const response = await fetch('http://localhost:8000/api/challenges/');
           const data = await response.json();
@@ -60,6 +108,7 @@
         } finally {
           setIsLoading(false);
         }
+        */
       };
 
       const handleCreateChallenge = async (newChallenge) => {
@@ -72,6 +121,25 @@
           return;
         }
 
+        // Create a mock challenge with user ID
+        const mockChallenge = {
+          ...newChallenge,
+          id: Date.now().toString(), // Generate a unique ID
+          created_by: user.id,
+          created_at: new Date().toISOString()
+        };
+
+        // Add the new challenge to the state
+        setChallenges(prevChallenges => [mockChallenge, ...prevChallenges]);
+
+        toast({
+          title: "Challenge Created!",
+          description: `Successfully created challenge: ${newChallenge.name}.`
+        });
+
+        // The code below is the original implementation
+        // Uncomment when the backend is properly set up
+        /*
         try {
           // Add the user ID to the challenge
           const challengeWithUser = {
@@ -111,9 +179,21 @@
             variant: "destructive"
           });
         }
+        */
       };
 
       const handleDeleteChallenge = async (challengeId) => {
+        // Simply remove the challenge from the state
+        setChallenges(prevChallenges => prevChallenges.filter(c => c.id !== challengeId));
+
+        toast({
+          title: "Challenge Deleted",
+          description: "The challenge has been successfully deleted."
+        });
+
+        // The code below is the original implementation
+        // Uncomment when the backend is properly set up
+        /*
         try {
           const response = await fetch(`http://localhost:8000/api/challenges/${challengeId}/`, {
             method: 'DELETE'
@@ -143,10 +223,11 @@
             variant: "destructive"
           });
         }
+        */
       };
 
       // Placeholder for edit functionality
-      const handleEditChallenge = (challengeId) => {
+      const handleEditChallenge = (/* challengeId */) => {
         toast({
           title: "Edit Not Implemented",
           description: "Challenge editing functionality is planned for a future update.",

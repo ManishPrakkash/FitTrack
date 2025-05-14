@@ -45,8 +45,11 @@ class LoginView(APIView):
         email = request.data.get('email')
         password = request.data.get('password')
 
+        print(f"Login attempt for email: {email}")
+
         # Validate input
         if not email or not password:
+            print("Email or password missing")
             return Response({
                 'success': False,
                 'message': 'Email and password are required'
@@ -56,18 +59,22 @@ class LoginView(APIView):
         user = authenticate_user(email, password)
 
         if user:
+            print(f"User authenticated successfully: {user['name']}")
             return Response({
                 'success': True,
                 'user': user
             }, status=status.HTTP_200_OK)
 
         # Check if user exists
-        if get_user_by_email(email):
+        existing_user = get_user_by_email(email)
+        if existing_user:
+            print(f"User exists but password is incorrect: {existing_user['name']}")
             return Response({
                 'success': False,
                 'message': 'Invalid credentials'
             }, status=status.HTTP_401_UNAUTHORIZED)
         else:
+            print(f"User not found with email: {email}")
             return Response({
                 'success': False,
                 'message': 'User not found'

@@ -5,7 +5,7 @@ from datetime import datetime
 
 # MongoDB connection
 client = MongoClient('mongodb://localhost:27017/')
-db = client['fittrack_db']
+db = client['fitrack_db']
 challenges_collection = db['challenges']
 user_progress_collection = db['user_progress']
 users_collection = db['users']
@@ -25,9 +25,9 @@ def create_challenge(name, type, description, goal, unit, created_by):
         'created_at': datetime.now(),
         'updated_at': datetime.now()
     }
-    
+
     result = challenges_collection.insert_one(challenge)
-    
+
     if result.inserted_id:
         return challenge
     return None
@@ -62,7 +62,7 @@ def create_or_update_progress(user_id, challenge_id, current_value):
         'user_id': user_id,
         'challenge_id': challenge_id
     })
-    
+
     if existing_progress:
         # Update existing progress
         result = user_progress_collection.update_one(
@@ -81,13 +81,13 @@ def create_or_update_progress(user_id, challenge_id, current_value):
             'joined_at': datetime.now(),
             'last_updated': datetime.now()
         }
-        
+
         result = user_progress_collection.insert_one(progress)
-        
+
         if result.inserted_id:
             progress.pop('_id', None)
             return progress
-    
+
     return None
 
 def get_user_progress(user_id):
@@ -115,10 +115,10 @@ def get_challenge_leaderboard(challenge_id):
     challenge = get_challenge_by_id(challenge_id)
     if not challenge:
         return []
-    
+
     # Get all progress entries for this challenge
     progress_entries = list(user_progress_collection.find({'challenge_id': challenge_id}, {'_id': 0}))
-    
+
     # Create leaderboard entries with user information
     leaderboard = []
     for entry in progress_entries:
@@ -126,7 +126,7 @@ def get_challenge_leaderboard(challenge_id):
         if user:
             name_parts = user['name'].split()
             avatar_text = ''.join([part[0].upper() for part in name_parts if part])
-            
+
             leaderboard.append({
                 'user_id': user['id'],
                 'name': user['name'],
@@ -134,8 +134,8 @@ def get_challenge_leaderboard(challenge_id):
                 'score': entry['current_value'],
                 'unit': challenge['unit']
             })
-    
+
     # Sort by score (descending)
     leaderboard.sort(key=lambda x: x['score'], reverse=True)
-    
+
     return leaderboard

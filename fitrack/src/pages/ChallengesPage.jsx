@@ -20,9 +20,17 @@
 
       useEffect(() => {
         // Get user data from localStorage
-        const userData = localStorage.getItem('fittrack_user');
+        const userData = localStorage.getItem('fitrack_user');
         if (userData) {
-          setUser(JSON.parse(userData));
+          try {
+            const parsedUser = JSON.parse(userData);
+            console.log('User data found in ChallengesPage:', parsedUser);
+            setUser(parsedUser);
+          } catch (err) {
+            console.error('Error parsing user data:', err);
+          }
+        } else {
+          console.log('No user data found in localStorage');
         }
 
         // Fetch challenges and user progress
@@ -31,6 +39,56 @@
 
       const fetchChallenges = async () => {
         setIsLoading(true);
+
+        // Use mock data for now
+        setTimeout(() => {
+          const mockChallenges = [
+            {
+              id: '1',
+              name: 'Morning Mile Run',
+              type: 'Running',
+              description: 'Run 1 mile every morning for 30 days.',
+              goal: 30,
+              unit: 'miles',
+              created_by: '123456'
+            },
+            {
+              id: '2',
+              name: '10k Steps Daily',
+              type: 'Walking',
+              description: 'Achieve 10,000 steps every day for a month.',
+              goal: 300000,
+              unit: 'steps',
+              created_by: '123456'
+            },
+            {
+              id: '3',
+              name: 'Cycle 100km Weekly',
+              type: 'Cycling',
+              description: 'Cycle a total of 100km each week for 4 weeks.',
+              goal: 400,
+              unit: 'km',
+              created_by: '123456'
+            }
+          ];
+
+          setChallenges(mockChallenges);
+
+          // If user is logged in, create mock progress
+          if (user) {
+            const mockProgress = {
+              '1': { joined: true, current: 15 },  // 50% progress on challenge 1
+              '3': { joined: true, current: 100 }  // 25% progress on challenge 3
+            };
+            setUserProgress(mockProgress);
+          }
+
+          setIsLoading(false);
+        }, 500);
+
+        // The code below is the original implementation
+        // Uncomment when the backend is properly set up
+        /*
         try {
           // Fetch all challenges
           const response = await fetch('http://localhost:8000/api/challenges/');
@@ -60,6 +118,7 @@
         } finally {
           setIsLoading(false);
         }
+        */
       };
 
       const fetchUserProgress = async (userId) => {
@@ -93,6 +152,20 @@
           return;
         }
 
+        // Update local state with mock data
+        setUserProgress(prev => ({
+          ...prev,
+          [challengeId]: { joined: true, current: 0 }
+        }));
+
+        toast({
+          title: "Challenge Joined",
+          description: "You've successfully joined this challenge!"
+        });
+
+        // The code below is the original implementation
+        // Uncomment when the backend is properly set up
+        /*
         try {
           // Create progress entry with 0 value
           const progressData = {
@@ -137,6 +210,7 @@
             variant: "destructive"
           });
         }
+        */
       };
 
       const handleLogActivity = async (challengeId, value) => {
@@ -149,6 +223,24 @@
           return;
         }
 
+        // Get current progress
+        const currentVal = userProgress[challengeId]?.current || 0;
+        const newValue = currentVal + value;
+
+        // Update local state with mock data
+        setUserProgress(prev => ({
+          ...prev,
+          [challengeId]: { ...prev[challengeId], current: newValue }
+        }));
+
+        toast({
+          title: "Activity Logged",
+          description: `You've logged ${value} ${challenges.find(c => c.id === challengeId)?.unit}!`
+        });
+
+        // The code below is the original implementation
+        // Uncomment when the backend is properly set up
+        /*
         try {
           // Get current progress
           const currentVal = userProgress[challengeId]?.current || 0;
@@ -197,6 +289,7 @@
             variant: "destructive"
           });
         }
+        */
       };
 
       const openLogModal = (challengeId) => {

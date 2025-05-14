@@ -9,6 +9,7 @@ import AdminPage from '@/pages/AdminPage.jsx';
 import NotFoundPage from '@/pages/NotFoundPage.jsx';
 import LoginPage from '@/pages/login.jsx';
 import SignupPage from '@/pages/signup.jsx';
+import TestLoginPage from '@/pages/TestLoginPage.jsx';
 import { Toaster } from '@/components/ui/toaster.jsx';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -61,6 +62,7 @@ const AppContent = () => {
           <Routes location={location} key={location.pathname}>
             <Route path="/login" element={<PageLayout><LoginPage /></PageLayout>} />
             <Route path="/signup" element={<PageLayout><SignupPage /></PageLayout>} />
+            <Route path="/test-login" element={<PageLayout><TestLoginPage /></PageLayout>} />
             <Route
               path="*"
               element={

@@ -28,7 +28,15 @@ const HomePage = () => {
     // Check if user is logged in
     const userData = localStorage.getItem('fitrack_user');
     if (userData) {
-      setUser(JSON.parse(userData));
+      try {
+        const parsedUser = JSON.parse(userData);
+        console.log('User data found in HomePage:', parsedUser);
+        setUser(parsedUser);
+      } catch (err) {
+        console.error('Error parsing user data:', err);
+      }
+    } else {
+      console.log('No user data found in localStorage');
     }
   }, []);
 

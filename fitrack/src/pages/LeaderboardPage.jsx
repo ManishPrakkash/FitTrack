@@ -39,6 +39,46 @@
 
       const fetchChallenges = async () => {
         setIsLoading(true);
+
+        // Use mock data for now
+        setTimeout(() => {
+          const mockChallenges = [
+            {
+              id: '1',
+              name: 'Morning Mile Run',
+              type: 'Running',
+              description: 'Run 1 mile every morning for 30 days.',
+              goal: 30,
+              unit: 'miles',
+              created_by: '123456'
+            },
+            {
+              id: '2',
+              name: '10k Steps Daily',
+              type: 'Walking',
+              description: 'Achieve 10,000 steps every day for a month.',
+              goal: 300000,
+              unit: 'steps',
+              created_by: '123456'
+            },
+            {
+              id: '3',
+              name: 'Cycle 100km Weekly',
+              type: 'Cycling',
+              description: 'Cycle a total of 100km each week for 4 weeks.',
+              goal: 400,
+              unit: 'km',
+              created_by: '123456'
+            }
+          ];
+
+          setChallenges(mockChallenges);
+          setIsLoading(false);
+        }, 500);
+
+        // The code below is the original implementation
+        // Uncomment when the backend is properly set up
+        /*
         try {
           const response = await fetch('http://localhost:8000/api/challenges/');
           const data = await response.json();
@@ -62,10 +102,59 @@
         } finally {
           setIsLoading(false);
         }
+        */
       };
 
       const fetchLeaderboard = async (challengeId) => {
         setIsLeaderboardLoading(true);
+
+        // Use mock data for now
+        setTimeout(() => {
+          const mockLeaderboard = [
+            {
+              user_id: 'user1',
+              name: 'Alex Johnson',
+              avatar_text: 'AJ',
+              score: 25,
+              unit: challenges.find(c => c.id === challengeId)?.unit || 'units'
+            },
+            {
+              user_id: 'user2',
+              name: 'Sam Wilson',
+              avatar_text: 'SW',
+              score: 22,
+              unit: challenges.find(c => c.id === challengeId)?.unit || 'units'
+            },
+            {
+              user_id: 'user3',
+              name: 'Taylor Smith',
+              avatar_text: 'TS',
+              score: 18,
+              unit: challenges.find(c => c.id === challengeId)?.unit || 'units'
+            },
+            {
+              user_id: 'user4',
+              name: 'Jordan Lee',
+              avatar_text: 'JL',
+              score: 15,
+              unit: challenges.find(c => c.id === challengeId)?.unit || 'units'
+            },
+            {
+              user_id: '123456',
+              name: 'Test User',
+              avatar_text: 'TU',
+              score: 12,
+              unit: challenges.find(c => c.id === challengeId)?.unit || 'units'
+            }
+          ];
+
+          setLeaderboardData(mockLeaderboard);
+          setIsLeaderboardLoading(false);
+        }, 500);
+
+        // The code below is the original implementation
+        // Uncomment when the backend is properly set up
+        /*
         try {
           const response = await fetch(`http://localhost:8000/api/leaderboard/${challengeId}/`);
           const data = await response.json();
@@ -91,14 +180,15 @@
         } finally {
           setIsLeaderboardLoading(false);
         }
+        */
       };
 
       const handleShare = () => {
         const challengeName = challenges.find(c => c.id === selectedChallengeId)?.name || "Fitness Challenge";
-        const text = `Checking out the leaderboard for ${challengeName} on FitTrack! Come join the fun!`;
+        const text = `Checking out the leaderboard for ${challengeName} on Fitrack! Come join the fun!`;
         if (navigator.share) {
           navigator.share({
-            title: 'FitTrack Leaderboard',
+            title: 'Fitrack Leaderboard',
             text: text,
             url: window.location.href,
           }).catch(console.error);

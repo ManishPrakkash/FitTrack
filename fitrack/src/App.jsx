@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Header from '@/components/layout/Header.jsx';
 import Footer from '@/components/layout/Footer.jsx';
 import HomePage from '@/pages/HomePage.jsx';
@@ -27,6 +27,15 @@ const PageLayout = ({ children }) => {
   );
 };
 
+const RequireAuth = ({ children }) => {
+  const isAuthenticated = !!localStorage.getItem('fittrack_user');
+  const location = useLocation();
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  return children;
+};
+
 const AppContent = () => {
   const location = useLocation();
   return (
@@ -35,13 +44,22 @@ const AppContent = () => {
       <main className="flex-grow">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<PageLayout><HomePage /></PageLayout>} />
-            <Route path="/challenges" element={<PageLayout><ChallengesPage /></PageLayout>} />
-            <Route path="/leaderboard" element={<PageLayout><LeaderboardPage /></PageLayout>} />
-            <Route path="/admin" element={<PageLayout><AdminPage /></PageLayout>} />
             <Route path="/login" element={<PageLayout><LoginPage /></PageLayout>} />
             <Route path="/signup" element={<PageLayout><SignupPage /></PageLayout>} />
-            <Route path="*" element={<PageLayout><NotFoundPage /></PageLayout>} />
+            <Route
+              path="*"
+              element={
+                <RequireAuth>
+                  <Routes location={location} key={location.pathname}>
+                    <Route path="/" element={<PageLayout><HomePage /></PageLayout>} />
+                    <Route path="/challenges" element={<PageLayout><ChallengesPage /></PageLayout>} />
+                    <Route path="/leaderboard" element={<PageLayout><LeaderboardPage /></PageLayout>} />
+                    <Route path="/admin" element={<PageLayout><AdminPage /></PageLayout>} />
+                    <Route path="*" element={<PageLayout><NotFoundPage /></PageLayout>} />
+                  </Routes>
+                </RequireAuth>
+              }
+            />
           </Routes>
         </AnimatePresence>
       </main>
@@ -53,7 +71,7 @@ const AppContent = () => {
 
 function App() {
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AppContent />
     </Router>
   );

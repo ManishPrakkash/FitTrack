@@ -5,14 +5,35 @@ import { Label } from '@/components/ui/label.jsx';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card.jsx';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { AlertCircle } from 'lucide-react';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Reset previous errors
+    setError('');
+    setEmailError('');
+    setPasswordError('');
+
+    // Validate inputs
+    if (!email) {
+      setEmailError('Email is required');
+      return;
+    }
+
+    if (!password) {
+      setPasswordError('Password is required');
+      return;
+    }
+
     try {
       const res = await fetch('http://localhost:8000/api/login/', {
         method: 'POST',
@@ -20,16 +41,24 @@ const LoginPage = () => {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
+
       if (data.success) {
         localStorage.setItem('fittrack_user', JSON.stringify(data.user));
         // Dispatch a custom event to notify other components about the login
         window.dispatchEvent(new Event('userLogin'));
         navigate('/');
       } else {
-        alert('Login failed: ' + (data.message || 'Unknown error'));
+        // Handle different error types
+        if (data.message === 'User not found') {
+          setEmailError('No account found with this email');
+        } else if (data.message === 'Invalid credentials') {
+          setPasswordError('Incorrect password');
+        } else {
+          setError(data.message || 'Login failed. Please try again.');
+        }
       }
     } catch (err) {
-      alert('Login failed: ' + err.message);
+      setError('Connection error. Please try again later.');
     }
   };
 
@@ -47,6 +76,13 @@ const LoginPage = () => {
           <CardDescription>Access your FitTrack account</CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md flex items-center mb-4">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -54,26 +90,48 @@ const LoginPage = () => {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError('');
+                }}
                 placeholder="Enter your email"
-                required
                 autoComplete="email"
-                className="bg-secondary/10 border border-secondary/50 text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary"
+                className={`bg-secondary/10 border ${
+                  emailError ? 'border-destructive' : 'border-secondary/50'
+                } text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary`}
               />
+              {emailError && (
+                <div className="text-destructive text-sm flex items-center mt-1">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  {emailError}
+                </div>
+              )}
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (passwordError) setPasswordError('');
+                }}
                 placeholder="Enter your password"
-                required
                 autoComplete="current-password"
-                className="bg-secondary/10 border border-secondary/50 text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary"
+                className={`bg-secondary/10 border ${
+                  passwordError ? 'border-destructive' : 'border-secondary/50'
+                } text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary`}
               />
+              {passwordError && (
+                <div className="text-destructive text-sm flex items-center mt-1">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  {passwordError}
+                </div>
+              )}
             </div>
+
             <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
               Login
             </Button>

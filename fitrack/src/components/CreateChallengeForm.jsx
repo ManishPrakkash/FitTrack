@@ -25,21 +25,20 @@
           });
           return;
         }
+
+        // Create challenge object to send to the backend
         const newChallenge = {
-          id: Date.now().toString(),
           name,
           type,
           description,
           goal: parseFloat(goal),
           unit,
-          participants: 0,
-          createdAt: new Date().toISOString(),
         };
+
+        // Pass the challenge to the parent component for API handling
         onCreateChallenge(newChallenge);
-        toast({
-          title: "Challenge Created!",
-          description: `Successfully created challenge: ${name}.`,
-        });
+
+        // Reset form fields
         setName('');
         setType('Walking');
         setDescription('');
@@ -62,10 +61,10 @@
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="challengeType">Challenge Type</Label>
-                  <select 
-                    id="challengeType" 
-                    value={type} 
-                    onChange={(e) => setType(e.target.value)} 
+                  <select
+                    id="challengeType"
+                    value={type}
+                    onChange={(e) => setType(e.target.value)}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   >
                     <option value="Walking">Walking</option>
@@ -86,10 +85,10 @@
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="challengeUnit">Unit</Label>
-                     <select 
-                      id="challengeUnit" 
-                      value={unit} 
-                      onChange={(e) => setUnit(e.target.value)} 
+                     <select
+                      id="challengeUnit"
+                      value={unit}
+                      onChange={(e) => setUnit(e.target.value)}
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     >
                       <option value="km">km</option>
@@ -109,4 +108,3 @@
     };
 
     export default CreateChallengeForm;
-  

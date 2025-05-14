@@ -1,10 +1,9 @@
 
-    import React from 'react';
+    import React, { useState, useEffect } from 'react';
     import CreateChallengeForm from '@/components/CreateChallengeForm.jsx';
-    import { useLocalStorage } from '@/hooks/useLocalStorage.jsx';
     import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card.jsx';
     import { Button } from '@/components/ui/button.jsx';
-    import { Trash2, Edit3, Eye } from 'lucide-react';
+    import { Trash2, Edit3, RefreshCw } from 'lucide-react';
     import { motion } from 'framer-motion';
     import {
       AlertDialog,
@@ -16,25 +15,136 @@
       AlertDialogHeader,
       AlertDialogTitle,
       AlertDialogTrigger,
-    } from "@/components/ui/alert-dialog.jsx"; // Assuming alert-dialog is created
-     import { useToast } from "@/components/ui/use-toast.jsx";
+    } from "@/components/ui/alert-dialog.jsx";
+    import { useToast } from "@/components/ui/use-toast.jsx";
 
     const AdminPage = () => {
-      const [challenges, setChallenges] = useLocalStorage('challenges', []);
+      const [challenges, setChallenges] = useState([]);
+      const [isLoading, setIsLoading] = useState(true);
       const { toast } = useToast();
+      const [user, setUser] = useState(null);
 
-      const handleCreateChallenge = (newChallenge) => {
-        setChallenges(prevChallenges => [newChallenge, ...prevChallenges]);
+      useEffect(() => {
+        // Get user data from localStorage
+        const userData = localStorage.getItem('fittrack_user');
+        if (userData) {
+          setUser(JSON.parse(userData));
+        }
+
+        // Fetch challenges from the backend
+        fetchChallenges();
+      }, []);
+
+      const fetchChallenges = async () => {
+        setIsLoading(true);
+        try {
+          const response = await fetch('http://localhost:8000/api/challenges/');
+          const data = await response.json();
+
+          if (data.success) {
+            setChallenges(data.challenges);
+          } else {
+            toast({
+              title: "Error",
+              description: "Failed to load challenges.",
+              variant: "destructive"
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching challenges:", error);
+          toast({
+            title: "Connection Error",
+            description: "Could not connect to the server.",
+            variant: "destructive"
+          });
+        } finally {
+          setIsLoading(false);
+        }
       };
 
-      const handleDeleteChallenge = (challengeId) => {
-        setChallenges(prevChallenges => prevChallenges.filter(c => c.id !== challengeId));
-         toast({
-          title: "Challenge Deleted",
-          description: "The challenge has been successfully deleted.",
-        });
+      const handleCreateChallenge = async (newChallenge) => {
+        if (!user) {
+          toast({
+            title: "Authentication Required",
+            description: "You must be logged in to create challenges.",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        try {
+          // Add the user ID to the challenge
+          const challengeWithUser = {
+            ...newChallenge,
+            created_by: user.id
+          };
+
+          const response = await fetch('http://localhost:8000/api/challenges/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(challengeWithUser)
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Add the new challenge to the state
+            setChallenges(prevChallenges => [data.challenge, ...prevChallenges]);
+            toast({
+              title: "Challenge Created!",
+              description: `Successfully created challenge: ${newChallenge.name}.`
+            });
+          } else {
+            toast({
+              title: "Error",
+              description: data.error?.message || "Failed to create challenge.",
+              variant: "destructive"
+            });
+          }
+        } catch (error) {
+          console.error("Error creating challenge:", error);
+          toast({
+            title: "Connection Error",
+            description: "Could not connect to the server.",
+            variant: "destructive"
+          });
+        }
       };
-      
+
+      const handleDeleteChallenge = async (challengeId) => {
+        try {
+          const response = await fetch(`http://localhost:8000/api/challenges/${challengeId}/`, {
+            method: 'DELETE'
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Remove the challenge from the state
+            setChallenges(prevChallenges => prevChallenges.filter(c => c.id !== challengeId));
+            toast({
+              title: "Challenge Deleted",
+              description: "The challenge has been successfully deleted."
+            });
+          } else {
+            toast({
+              title: "Error",
+              description: data.error?.message || "Failed to delete challenge.",
+              variant: "destructive"
+            });
+          }
+        } catch (error) {
+          console.error("Error deleting challenge:", error);
+          toast({
+            title: "Connection Error",
+            description: "Could not connect to the server.",
+            variant: "destructive"
+          });
+        }
+      };
+
       // Placeholder for edit functionality
       const handleEditChallenge = (challengeId) => {
         toast({
@@ -46,7 +156,7 @@
 
 
       return (
-        <motion.div 
+        <motion.div
           className="container mx-auto py-8 px-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -54,7 +164,19 @@
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-4xl font-bold mb-8 text-foreground">Admin Dashboard</h1>
-          
+
+          <div className="flex justify-end mb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchChallenges}
+              className="flex items-center"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh Challenges
+            </Button>
+          </div>
+
           <div className="grid md:grid-cols-2 gap-8">
             <section>
               <CreateChallengeForm onCreateChallenge={handleCreateChallenge} />
@@ -67,12 +189,16 @@
                   <CardDescription>View, edit, or delete existing challenges.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {challenges.length === 0 ? (
+                  {isLoading ? (
+                    <div className="flex justify-center py-8">
+                      <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : challenges.length === 0 ? (
                     <p className="text-muted-foreground text-center py-4">No challenges created yet.</p>
                   ) : (
                     <ul className="space-y-4">
                       {challenges.map(challenge => (
-                        <motion.li 
+                        <motion.li
                           key={challenge.id}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -123,4 +249,3 @@
     };
 
     export default AdminPage;
-  

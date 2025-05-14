@@ -2,47 +2,208 @@
     import React, { useState, useEffect } from 'react';
     import ChallengeCard from '@/components/ChallengeCard.jsx';
     import ActivityLogModal from '@/components/ActivityLogModal.jsx';
-    import { useLocalStorage } from '@/hooks/useLocalStorage.jsx';
     import { motion, AnimatePresence } from 'framer-motion';
     import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.jsx";
-    import { PlusCircle } from 'lucide-react';
+    import { PlusCircle, RefreshCw } from 'lucide-react';
     import { Button } from '@/components/ui/button.jsx';
     import { Link } from 'react-router-dom';
-
-    const initialChallenges = [
-      { id: '1', name: 'Morning Mile Run', type: 'Running', description: 'Run 1 mile every morning for 30 days.', goal: 30, unit: 'miles', participants: 120 },
-      { id: '2', name: '10k Steps Daily', type: 'Walking', description: 'Achieve 10,000 steps every day for a month.', goal: 300000, unit: 'steps', participants: 250 },
-      { id: '3', name: 'Cycle 100km Weekly', type: 'Cycling', description: 'Cycle a total of 100km each week for 4 weeks.', goal: 400, unit: 'km', participants: 75 },
-    ];
+    import { useToast } from '@/components/ui/use-toast.jsx';
 
     const ChallengesPage = () => {
-      const [challenges, setChallenges] = useLocalStorage('challenges', initialChallenges);
-      const [userProgress, setUserProgress] = useLocalStorage('userProgress', {});
+      const [challenges, setChallenges] = useState([]);
+      const [userProgress, setUserProgress] = useState({});
       const [isModalOpen, setIsModalOpen] = useState(false);
       const [selectedChallenge, setSelectedChallenge] = useState(null);
+      const [isLoading, setIsLoading] = useState(true);
+      const [user, setUser] = useState(null);
+      const { toast } = useToast();
 
-      const handleJoinChallenge = (challengeId) => {
-        setUserProgress(prev => ({
-          ...prev,
-          [challengeId]: { ...(prev[challengeId] || { joined: false, current: 0 }), joined: true }
-        }));
+      useEffect(() => {
+        // Get user data from localStorage
+        const userData = localStorage.getItem('fittrack_user');
+        if (userData) {
+          setUser(JSON.parse(userData));
+        }
+
+        // Fetch challenges and user progress
+        fetchChallenges();
+      }, []);
+
+      const fetchChallenges = async () => {
+        setIsLoading(true);
+        try {
+          // Fetch all challenges
+          const response = await fetch('http://localhost:8000/api/challenges/');
+          const data = await response.json();
+
+          if (data.success) {
+            setChallenges(data.challenges);
+
+            // If user is logged in, fetch their progress
+            if (user) {
+              fetchUserProgress(user.id);
+            }
+          } else {
+            toast({
+              title: "Error",
+              description: "Failed to load challenges.",
+              variant: "destructive"
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching challenges:", error);
+          toast({
+            title: "Connection Error",
+            description: "Could not connect to the server.",
+            variant: "destructive"
+          });
+        } finally {
+          setIsLoading(false);
+        }
       };
 
-      const handleLogActivity = (challengeId, value) => {
-        setUserProgress(prev => {
-          const currentVal = prev[challengeId]?.current || 0;
-          return {
-            ...prev,
-            [challengeId]: { ...prev[challengeId], current: currentVal + value }
+      const fetchUserProgress = async (userId) => {
+        try {
+          const response = await fetch(`http://localhost:8000/api/progress/${userId}/`);
+          const data = await response.json();
+
+          if (data.success) {
+            // Convert array of progress objects to a map for easier access
+            const progressMap = {};
+            data.progress.forEach(item => {
+              progressMap[item.challenge_id] = {
+                joined: true,
+                current: item.current_value
+              };
+            });
+            setUserProgress(progressMap);
+          }
+        } catch (error) {
+          console.error("Error fetching user progress:", error);
+        }
+      };
+
+      const handleJoinChallenge = async (challengeId) => {
+        if (!user) {
+          toast({
+            title: "Authentication Required",
+            description: "You must be logged in to join challenges.",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        try {
+          // Create progress entry with 0 value
+          const progressData = {
+            user_id: user.id,
+            challenge_id: challengeId,
+            current_value: 0
           };
-        });
+
+          const response = await fetch('http://localhost:8000/api/progress/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(progressData)
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Update local state
+            setUserProgress(prev => ({
+              ...prev,
+              [challengeId]: { joined: true, current: 0 }
+            }));
+
+            toast({
+              title: "Challenge Joined",
+              description: "You've successfully joined this challenge!"
+            });
+          } else {
+            toast({
+              title: "Error",
+              description: data.error?.message || "Failed to join challenge.",
+              variant: "destructive"
+            });
+          }
+        } catch (error) {
+          console.error("Error joining challenge:", error);
+          toast({
+            title: "Connection Error",
+            description: "Could not connect to the server.",
+            variant: "destructive"
+          });
+        }
+      };
+
+      const handleLogActivity = async (challengeId, value) => {
+        if (!user) {
+          toast({
+            title: "Authentication Required",
+            description: "You must be logged in to log activity.",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        try {
+          // Get current progress
+          const currentVal = userProgress[challengeId]?.current || 0;
+          const newValue = currentVal + value;
+
+          // Update progress in the backend
+          const progressData = {
+            user_id: user.id,
+            challenge_id: challengeId,
+            current_value: newValue
+          };
+
+          const response = await fetch('http://localhost:8000/api/progress/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(progressData)
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Update local state
+            setUserProgress(prev => ({
+              ...prev,
+              [challengeId]: { ...prev[challengeId], current: newValue }
+            }));
+
+            toast({
+              title: "Activity Logged",
+              description: `You've logged ${value} ${challenges.find(c => c.id === challengeId)?.unit}!`
+            });
+          } else {
+            toast({
+              title: "Error",
+              description: data.error?.message || "Failed to log activity.",
+              variant: "destructive"
+            });
+          }
+        } catch (error) {
+          console.error("Error logging activity:", error);
+          toast({
+            title: "Connection Error",
+            description: "Could not connect to the server.",
+            variant: "destructive"
+          });
+        }
       };
 
       const openLogModal = (challengeId) => {
         setSelectedChallenge(challenges.find(c => c.id === challengeId));
         setIsModalOpen(true);
       };
-      
+
       const calculateProgressPercent = (challengeId) => {
         const challenge = challenges.find(c => c.id === challengeId);
         if (!challenge || !userProgress[challengeId] || !userProgress[challengeId].joined) return 0;
@@ -54,7 +215,7 @@
       const availableChallenges = challenges.filter(c => !userProgress[c.id]?.joined);
 
       return (
-        <motion.div 
+        <motion.div
           className="container mx-auto py-8 px-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -63,11 +224,22 @@
         >
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-4xl font-bold text-foreground">Fitness Challenges</h1>
-            <Link to="/admin">
-              <Button variant="outline">
-                <PlusCircle className="mr-2 h-4 w-4" /> Create Challenge
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchChallenges}
+                className="flex items-center"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
               </Button>
-            </Link>
+              <Link to="/admin">
+                <Button variant="outline">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Create Challenge
+                </Button>
+              </Link>
+            </div>
           </div>
 
           <Tabs defaultValue="all" className="w-full">
@@ -86,7 +258,11 @@
                   transition={{ duration: 0.3 }}
                   className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
-                  {challenges.length === 0 ? (
+                  {isLoading ? (
+                    <div className="flex justify-center py-8 col-span-full">
+                      <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : challenges.length === 0 ? (
                      <p className="text-muted-foreground col-span-full text-center py-10">No challenges available yet. Admins can create new ones!</p>
                   ) : (
                     challenges.map(challenge => (
@@ -170,4 +346,3 @@
     };
 
     export default ChallengesPage;
-  

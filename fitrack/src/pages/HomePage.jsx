@@ -126,12 +126,6 @@ const HomePage = () => {
           </Link>
         </motion.div>
       </section>
-      <div className="mt-12 text-center">
-        <h3 className="text-xl font-semibold mb-2 text-foreground">Powered by Modern Tech</h3>
-        <p className="text-sm text-muted-foreground">
-          Built with React, TailwindCSS, and Framer Motion for a sleek, responsive experience.
-        </p>
-      </div>
       {!user && (
         <div className="text-center mt-8">
           <h1 className="text-5xl font-bold mb-6 text-foreground">Welcome to FitTrack</h1>
@@ -155,14 +149,6 @@ const HomePage = () => {
           <p className="text-lg text-muted-foreground mb-8">
             Continue your fitness journey, join new challenges, or check your progress.
           </p>
-          <div className="space-x-4">
-            <Link to="/challenges" className="bg-primary text-primary-foreground px-6 py-3 rounded hover:bg-primary/90">
-              My Challenges
-            </Link>
-            <Link to="/leaderboard" className="bg-secondary text-secondary-foreground px-6 py-3 rounded hover:bg-secondary/90">
-              Leaderboard
-            </Link>
-          </div>
         </div>
       )}
     </motion.div>

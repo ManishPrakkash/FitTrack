@@ -1,20 +1,18 @@
-import React from 'react';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Challenges from "./pages/Challenges";
+import NotFound from "./pages/NotFound";
 
 function App({ data, setData }) {
-	// Example: Update data and store it in localStorage
-	const handleUpdate = (newData) => {
-		setData(newData);
-	};
-
 	return (
-		<div>
-			{/* Example usage */}
-			<h1>Welcome to FitTrack</h1>
-			<p>Stored Data: {data ? JSON.stringify(data) : "No data available"}</p>
-			<button onClick={() => handleUpdate({ challenges: "Updated Data" })}>
-				Update Data
-			</button>
-		</div>
+		<Router>
+			<Routes>
+				<Route path="/" element={<Home />} />
+				<Route path="/challenges" element={<Challenges />} />
+				<Route path="*" element={<NotFound />} />
+			</Routes>
+		</Router>
 	);
 }
 

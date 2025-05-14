@@ -1,7 +1,7 @@
-{
+ {
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/(.)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -12,15 +12,7 @@
   ],
   "rewrites": [
     {
-      "source": "/leaderboard",
-      "destination": "/fitrack/index.html"
-    },
-    {
-      "source": "/challenges",
-      "destination": "/fitrack/index.html"
-    },
-    {
-      "source": "/admin",
+      "source": "/(.)",
       "destination": "/fitrack/index.html"
     }
   ],

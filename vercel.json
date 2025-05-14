@@ -12,7 +12,15 @@
   ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/leaderboard",
+      "destination": "/fitrack/index.html"
+    },
+    {
+      "source": "/challenges",
+      "destination": "/fitrack/index.html"
+    },
+    {
+      "source": "/admin",
       "destination": "/fitrack/index.html"
     }
   ],

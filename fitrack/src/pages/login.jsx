@@ -43,7 +43,7 @@ const LoginPage = () => {
       const data = await res.json();
 
       if (data.success) {
-        localStorage.setItem('fittrack_user', JSON.stringify(data.user));
+        localStorage.setItem('fitrack_user', JSON.stringify(data.user));
         // Dispatch a custom event to notify other components about the login
         window.dispatchEvent(new Event('userLogin'));
         navigate('/');
@@ -73,7 +73,7 @@ const LoginPage = () => {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Login</CardTitle>
-          <CardDescription>Access your FitTrack account</CardDescription>
+          <CardDescription>Access your Fitrack account</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (

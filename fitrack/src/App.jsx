@@ -28,7 +28,7 @@ const PageLayout = ({ children }) => {
 };
 
 const RequireAuth = ({ children }) => {
-  const isAuthenticated = !!localStorage.getItem('fittrack_user');
+  const isAuthenticated = !!localStorage.getItem('fitrack_user');
   const location = useLocation();
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
@@ -55,7 +55,7 @@ const AppContent = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <Header key={localStorage.getItem('fittrack_user') ? 'logged-in' : 'logged-out'} />
+      <Header key={localStorage.getItem('fitrack_user') ? 'logged-in' : 'logged-out'} />
       <main className="flex-grow">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>

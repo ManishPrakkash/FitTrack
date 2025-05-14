@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const Header = () => {
   return (
     <header className="flex justify-between items-center p-4 bg-gray-800 text-white">
-      <div className="text-lg font-bold">FitTrack</div>
+      <div className="text-lg font-bold">Fitrack</div>
       <nav className="flex items-center space-x-4">
         {/* Circular login/profile button */}
         <Link

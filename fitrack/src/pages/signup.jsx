@@ -86,7 +86,7 @@ const SignupPage = () => {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Sign Up</CardTitle>
-          <CardDescription>Create your FitTrack account</CardDescription>
+          <CardDescription>Create your Fitrack account</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (

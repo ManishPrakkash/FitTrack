@@ -1,21 +1,7 @@
-{
-  "headers": [
+{  "rewrites": [
     {
       "source": "/(.)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache"
-        }
-      ]
+      "destination": "/"
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.)",
-      "destination": "/fitrack/index.html"
-    }
-  ],
-  "cleanUrls": true,
-  "trailingSlash": false
+  ]
 }

@@ -38,9 +38,24 @@ const RequireAuth = ({ children }) => {
 
 const AppContent = () => {
   const location = useLocation();
+  const [, forceUpdate] = React.useState({});
+
+  // Force update when user logs in
+  React.useEffect(() => {
+    const handleUserLogin = () => {
+      forceUpdate({});
+    };
+
+    window.addEventListener('userLogin', handleUserLogin);
+
+    return () => {
+      window.removeEventListener('userLogin', handleUserLogin);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <Header />
+      <Header key={localStorage.getItem('fittrack_user') ? 'logged-in' : 'logged-out'} />
       <main className="flex-grow">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>

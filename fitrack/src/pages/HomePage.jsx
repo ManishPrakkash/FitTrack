@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button.jsx';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Zap, Trophy, Users } from 'lucide-react';
 
 const FeatureCard = ({ icon: Icon, title, description, link, linkText }) => (
-  <motion.div 
+  <motion.div
     className="bg-card p-6 rounded-lg shadow-lg border border-border"
     whileHover={{ y: -5, boxShadow: "0px 10px 20px hsla(var(--ring) / 0.2)"}}
     transition={{ type: "spring", stiffness: 300 }}
@@ -22,8 +22,18 @@ const FeatureCard = ({ icon: Icon, title, description, link, linkText }) => (
 );
 
 const HomePage = () => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const userData = localStorage.getItem('fittrack_user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
+
   return (
-    <motion.div 
+    <motion.div
       className="container mx-auto py-12 px-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -31,7 +41,7 @@ const HomePage = () => {
       transition={{ duration: 0.5 }}
     >
       <section className="text-center mb-16">
-        <motion.h1 
+        <motion.h1
           className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-muted-foreground to-primary bg-clip-text text-transparent"
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -39,7 +49,7 @@ const HomePage = () => {
         >
           Conquer Your Fitness Goals
         </motion.h1>
-        <motion.p 
+        <motion.p
           className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto"
           initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -61,31 +71,31 @@ const HomePage = () => {
       </section>
 
       <section className="grid md:grid-cols-3 gap-8 mb-16">
-        <FeatureCard 
-          icon={Zap} 
-          title="Join Challenges" 
+        <FeatureCard
+          icon={Zap}
+          title="Join Challenges"
           description="Discover a variety of fitness challenges tailored to different activities and fitness levels."
           link="/challenges"
           linkText="Find a Challenge"
         />
-        <FeatureCard 
-          icon={Trophy} 
-          title="Track Progress" 
+        <FeatureCard
+          icon={Trophy}
+          title="Track Progress"
           description="Log your activities seamlessly and visualize your journey towards achieving challenge goals."
           link="/challenges"
           linkText="View My Progress"
         />
-        <FeatureCard 
-          icon={Users} 
-          title="Compete & Share" 
+        <FeatureCard
+          icon={Users}
+          title="Compete & Share"
           description="See how you stack up against others on leaderboards and share your accomplishments."
           link="/leaderboard"
           linkText="Check Leaderboards"
         />
       </section>
-      
+
       <section className="bg-card p-8 rounded-lg shadow-lg border border-border text-center">
-        <motion.h2 
+        <motion.h2
           className="text-3xl font-semibold mb-4 text-foreground"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -94,7 +104,7 @@ const HomePage = () => {
         >
           Ready to Start Your Fitness Journey?
         </motion.h2>
-        <motion.p 
+        <motion.p
           className="text-muted-foreground mb-6 max-w-xl mx-auto"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -122,20 +132,39 @@ const HomePage = () => {
           Built with React, TailwindCSS, and Framer Motion for a sleek, responsive experience.
         </p>
       </div>
-      <div className="text-center mt-8">
-        <h1 className="text-5xl font-bold mb-6 text-foreground">Welcome to FitTrack</h1>
-        <p className="text-lg text-muted-foreground mb-8">
-          Track your fitness goals, join challenges, and compete on the leaderboard.
-        </p>
-        <div className="space-x-4">
-          <Link to="/login" className="bg-primary text-primary-foreground px-6 py-3 rounded hover:bg-primary/90">
-            Login
-          </Link>
-          <Link to="/signup" className="bg-secondary text-secondary-foreground px-6 py-3 rounded hover:bg-secondary/90">
-            Sign Up
-          </Link>
+      {!user && (
+        <div className="text-center mt-8">
+          <h1 className="text-5xl font-bold mb-6 text-foreground">Welcome to FitTrack</h1>
+          <p className="text-lg text-muted-foreground mb-8">
+            Track your fitness goals, join challenges, and compete on the leaderboard.
+          </p>
+          <div className="space-x-4">
+            <Link to="/login" className="bg-primary text-primary-foreground px-6 py-3 rounded hover:bg-primary/90">
+              Login
+            </Link>
+            <Link to="/signup" className="bg-secondary text-secondary-foreground px-6 py-3 rounded hover:bg-secondary/90">
+              Sign Up
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
+
+      {user && (
+        <div className="text-center mt-8">
+          <h1 className="text-5xl font-bold mb-6 text-foreground">Welcome back, {user.name}!</h1>
+          <p className="text-lg text-muted-foreground mb-8">
+            Continue your fitness journey, join new challenges, or check your progress.
+          </p>
+          <div className="space-x-4">
+            <Link to="/challenges" className="bg-primary text-primary-foreground px-6 py-3 rounded hover:bg-primary/90">
+              My Challenges
+            </Link>
+            <Link to="/leaderboard" className="bg-secondary text-secondary-foreground px-6 py-3 rounded hover:bg-secondary/90">
+              Leaderboard
+            </Link>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };

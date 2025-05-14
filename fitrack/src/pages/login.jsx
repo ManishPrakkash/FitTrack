@@ -22,6 +22,8 @@ const LoginPage = () => {
       const data = await res.json();
       if (data.success) {
         localStorage.setItem('fittrack_user', JSON.stringify(data.user));
+        // Dispatch a custom event to notify other components about the login
+        window.dispatchEvent(new Event('userLogin'));
         navigate('/');
       } else {
         alert('Login failed: ' + (data.message || 'Unknown error'));

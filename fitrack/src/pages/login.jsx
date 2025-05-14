@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button.jsx';
 import { Input } from '@/components/ui/input.jsx';
 import { Label } from '@/components/ui/label.jsx';
@@ -34,63 +34,18 @@ const LoginPage = () => {
       return;
     }
 
-    setError('');
-    setEmailError('');
-    setPasswordError('');
-
     try {
-      // Hardcoded login for testing
-      // This will allow login with any email/password combination
-      // Remove this in production
-
-      // Create a mock user object
-      const mockUser = {
-        id: '123456',
-        name: 'Test User',
-        email: email
-      };
-
-      // Store user data in localStorage
-      localStorage.setItem('fitrack_user', JSON.stringify(mockUser));
-
-      // Dispatch a custom event to notify other components about the login
-      window.dispatchEvent(new Event('userLogin'));
-
-      // Navigate to home page
-      navigate('/');
-
-      return; // Skip the API call for now
-
-      // The code below is the original implementation
-      // Uncomment when the backend is properly set up
-      /*
-      console.log('Attempting to login with:', { email });
-
-      const apiUrl = 'http://localhost:8000/api/login/';
-      console.log('Using API URL:', apiUrl);
-
-      const res = await fetch(apiUrl, {
+      const res = await fetch('http://localhost:8000/api/login/', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-
-      console.log('Response status:', res.status);
       const data = await res.json();
-      console.log('Response data:', data);
 
       if (data.success) {
-        // Store user data in localStorage
-        localStorage.setItem('fitrack_user', JSON.stringify(data.user));
-        console.log('User data stored in localStorage:', data.user);
-
+        localStorage.setItem('fittrack_user', JSON.stringify(data.user));
         // Dispatch a custom event to notify other components about the login
         window.dispatchEvent(new Event('userLogin'));
-
-        // Navigate to home page
         navigate('/');
       } else {
         // Handle different error types
@@ -102,9 +57,7 @@ const LoginPage = () => {
           setError(data.message || 'Login failed. Please try again.');
         }
       }
-      */
     } catch (err) {
-      console.error('Login error:', err);
       setError('Connection error. Please try again later.');
     }
   };
@@ -120,7 +73,7 @@ const LoginPage = () => {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Login</CardTitle>
-          <CardDescription>Access your Fitrack account</CardDescription>
+          <CardDescription>Access your FitTrack account</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (

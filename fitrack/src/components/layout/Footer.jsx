@@ -14,7 +14,7 @@
         >
           <div className="container mx-auto px-4">
             <p className="text-sm">
-              &copy; {currentYear} Fitrack. All rights reserved.
+              &copy; {currentYear} FitTrack. All rights reserved.
             </p>
             <p className="text-xs mt-1">
               Join challenges, track progress, and conquer your fitness goals!

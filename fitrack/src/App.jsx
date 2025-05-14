@@ -9,7 +9,6 @@ import AdminPage from '@/pages/AdminPage.jsx';
 import NotFoundPage from '@/pages/NotFoundPage.jsx';
 import LoginPage from '@/pages/login.jsx';
 import SignupPage from '@/pages/signup.jsx';
-import TestLoginPage from '@/pages/TestLoginPage.jsx';
 import { Toaster } from '@/components/ui/toaster.jsx';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -29,7 +28,7 @@ const PageLayout = ({ children }) => {
 };
 
 const RequireAuth = ({ children }) => {
-  const isAuthenticated = !!localStorage.getItem('fitrack_user');
+  const isAuthenticated = !!localStorage.getItem('fittrack_user');
   const location = useLocation();
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
@@ -56,13 +55,12 @@ const AppContent = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <Header key={localStorage.getItem('fitrack_user') ? 'logged-in' : 'logged-out'} />
+      <Header key={localStorage.getItem('fittrack_user') ? 'logged-in' : 'logged-out'} />
       <main className="flex-grow">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route path="/login" element={<PageLayout><LoginPage /></PageLayout>} />
             <Route path="/signup" element={<PageLayout><SignupPage /></PageLayout>} />
-            <Route path="/test-login" element={<PageLayout><TestLoginPage /></PageLayout>} />
             <Route
               path="*"
               element={

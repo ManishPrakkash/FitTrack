@@ -52,35 +52,10 @@ const SignupPage = () => {
 
     if (!isValid) return;
 
-    setError('');
-    setEmailError('');
-    setPasswordError('');
-    setNameError('');
-
     try {
-      // Hardcoded signup success for testing
-      // This will always succeed
-      // Remove this in production
-
-      // Navigate to login page
-      navigate('/login');
-
-      return; // Skip the API call for now
-
-      // The code below is the original implementation
-      // Uncomment when the backend is properly set up
-      /*
-      console.log('Attempting to register with:', { email });
-
-      const apiUrl = 'http://localhost:8000/api/register/';
-      console.log('Using API URL:', apiUrl);
-
-      const res = await fetch(apiUrl, {
+      const res = await fetch('http://localhost:8000/api/register/', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       });
       const data = await res.json();
@@ -95,9 +70,7 @@ const SignupPage = () => {
           setError(data.error?.message || 'Signup failed. Please try again.');
         }
       }
-      */
     } catch (err) {
-      console.error('Signup error:', err);
       setError('Connection error. Please try again later.');
     }
   };
@@ -113,7 +86,7 @@ const SignupPage = () => {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Sign Up</CardTitle>
-          <CardDescription>Create your Fitrack account</CardDescription>
+          <CardDescription>Create your FitTrack account</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (

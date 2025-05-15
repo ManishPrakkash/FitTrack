@@ -1,6 +1,6 @@
-# FitTrack Backend
+# Fitrack Backend
 
-This is the backend for the FitTrack application, built with Django and MongoDB.
+This is the backend for the Fitrack application, built with Django and MongoDB.
 
 ## Prerequisites
 

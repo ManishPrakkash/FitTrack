@@ -77,14 +77,14 @@
 
       useEffect(() => {
         // Check if user is logged in
-        const userData = localStorage.getItem('fittrack_user');
+        const userData = localStorage.getItem('fitrack_user');
         if (userData) {
           setUser(JSON.parse(userData));
         }
 
         // Listen for login events
         const handleUserLogin = () => {
-          const userData = localStorage.getItem('fittrack_user');
+          const userData = localStorage.getItem('fitrack_user');
           if (userData) {
             setUser(JSON.parse(userData));
           }
@@ -99,7 +99,7 @@
       }, []);
 
       const handleLogout = () => {
-        localStorage.removeItem('fittrack_user');
+        localStorage.removeItem('fitrack_user');
         setUser(null);
         // Dispatch event to notify other components
         window.dispatchEvent(new Event('userLogin'));
@@ -117,7 +117,7 @@
             <div className="flex items-center justify-between h-16">
               <Link to="/" className="flex items-center text-2xl font-bold text-foreground">
                 <Dumbbell className="h-8 w-8 mr-2 text-primary" />
-                FitTrack
+                Fitrack
               </Link>
 
               {user ? (

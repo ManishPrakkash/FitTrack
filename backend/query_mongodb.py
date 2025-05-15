@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-MongoDB Query Tool for FitTrack
+MongoDB Query Tool for Fitrack
 
-This script allows you to interact with the FitTrack MongoDB database
+This script allows you to interact with the Fitrack MongoDB database
 and perform various queries on the data.
 """
 
@@ -46,14 +46,14 @@ def view_all_users():
     """View all users in the database"""
     users = list(db.users.find())
     print(f"\n=== ALL USERS ({len(users)}) ===\n")
-    
+
     for user in users:
         print_document(user)
 
 def find_user_by_email(email):
     """Find a user by email"""
     user = db.users.find_one({"email": email})
-    
+
     if user:
         print(f"\n=== USER WITH EMAIL: {email} ===\n")
         print_document(user)
@@ -64,7 +64,7 @@ def find_user_by_name(name):
     """Find users by name (partial match)"""
     # Using a case-insensitive regex to find partial matches
     users = list(db.users.find({"name": {"$regex": name, "$options": "i"}}))
-    
+
     if users:
         print(f"\n=== USERS WITH NAME CONTAINING: {name} ({len(users)}) ===\n")
         for user in users:

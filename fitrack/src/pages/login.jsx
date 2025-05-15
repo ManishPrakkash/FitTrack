@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button.jsx';
 import { Input } from '@/components/ui/input.jsx';
@@ -44,7 +45,7 @@ const LoginPage = () => {
       const data = await res.json();
 
       if (data.success) {
-        localStorage.setItem('fittrack_user', JSON.stringify(data.user));
+        localStorage.setItem('fitrack_user', JSON.stringify(data.user));
         // Dispatch a custom event to notify other components about the login
         window.dispatchEvent(new Event('userLogin'));
         navigate('/');
@@ -59,7 +60,8 @@ const LoginPage = () => {
         }
       }
     } catch (err) {
-      setError('Connection error. Please try again later.');
+      console.error('Login error:', err);
+      setError(`Connection error: ${err.message || 'Unable to connect to the server'}. Please check your network connection and try again.`);
     }
   };
 
@@ -74,7 +76,7 @@ const LoginPage = () => {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Login</CardTitle>
-          <CardDescription>Access your FitTrack account</CardDescription>
+          <CardDescription>Access your Fitrack account</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (

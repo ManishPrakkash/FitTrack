@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password, check_password
 
 # MongoDB connection
 client = MongoClient('mongodb://localhost:27017/')
-db = client['fittrack_db']
+db = client['fitrack_db']
 users_collection = db['users']
 
 def create_user(name, email, password):
@@ -15,7 +15,7 @@ def create_user(name, email, password):
     # Check if user with this email already exists
     if users_collection.find_one({'email': email}):
         return None
-    
+
     # Create user document
     user = {
         'id': str(uuid.uuid4()),
@@ -25,10 +25,10 @@ def create_user(name, email, password):
         'created_at': None,  # MongoDB will use current time
         'updated_at': None   # MongoDB will use current time
     }
-    
+
     # Insert user into MongoDB
     result = users_collection.insert_one(user)
-    
+
     if result.inserted_id:
         # Return user without password
         user.pop('password')
@@ -46,10 +46,10 @@ def authenticate_user(email, password):
     Authenticate user with email and password
     """
     user = get_user_by_email(email)
-    
+
     if user and check_password(password, user.get('password', '')):
         # Return user without password
         user_data = {k: v for k, v in user.items() if k != 'password' and k != '_id'}
         return user_data
-    
+
     return None

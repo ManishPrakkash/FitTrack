@@ -72,7 +72,8 @@ const SignupPage = () => {
         }
       }
     } catch (err) {
-      setError('Connection error. Please try again later.');
+      console.error('Signup error:', err);
+      setError(`Connection error: ${err.message || 'Unable to connect to the server'}. Please check your network connection and try again.`);
     }
   };
 
@@ -87,7 +88,7 @@ const SignupPage = () => {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Sign Up</CardTitle>
-          <CardDescription>Create your FitTrack account</CardDescription>
+          <CardDescription>Create your Fitrack account</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (

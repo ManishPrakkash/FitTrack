@@ -5,15 +5,15 @@ from bson import json_util
 # Connect to MongoDB
 client = MongoClient('mongodb://localhost:27017/')
 
-# Check if fittrack_db exists
+# Check if fitrack_db exists
 all_dbs = client.list_database_names()
 print(f"All databases: {all_dbs}")
 
-if 'fittrack_db' in all_dbs:
-    print("\nfittrack_db exists!")
+if 'fitrack_db' in all_dbs:
+    print("\nfitrack_db exists!")
 
-    # Get the fittrack_db database
-    db = client['fittrack_db']
+    # Get the fitrack_db database
+    db = client['fitrack_db']
 
     # List all collections
     collections = db.list_collection_names()
@@ -48,11 +48,11 @@ if 'fittrack_db' in all_dbs:
         })
         print(f"Created test user with ID: {result.inserted_id}")
 else:
-    print("\nfittrack_db does not exist!")
+    print("\nfitrack_db does not exist!")
 
-    # Create fittrack_db and users collection
-    print("Creating fittrack_db and users collection...")
-    db = client['fittrack_db']
+    # Create fitrack_db and users collection
+    print("Creating fitrack_db and users collection...")
+    db = client['fitrack_db']
     result = db.users.insert_one({
         "name": "Test User",
         "email": "test_user@example.com",

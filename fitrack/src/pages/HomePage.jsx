@@ -26,7 +26,7 @@ const HomePage = () => {
 
   useEffect(() => {
     // Check if user is logged in
-    const userData = localStorage.getItem('fittrack_user');
+    const userData = localStorage.getItem('fitrack_user');
     if (userData) {
       setUser(JSON.parse(userData));
     }
@@ -55,7 +55,7 @@ const HomePage = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
         >
-          Join exciting fitness challenges, track your progress, compete with others, and achieve new personal bests with FitTrack.
+          Join exciting fitness challenges, track your progress, compete with others, and achieve new personal bests with Fitrack.
         </motion.p>
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -128,7 +128,7 @@ const HomePage = () => {
       </section>
       {!user && (
         <div className="text-center mt-8">
-          <h1 className="text-5xl font-bold mb-6 text-foreground">Welcome to FitTrack</h1>
+          <h1 className="text-5xl font-bold mb-6 text-foreground">Welcome to Fitrack</h1>
           <p className="text-lg text-muted-foreground mb-8">
             Track your fitness goals, join challenges, and compete on the leaderboard.
           </p>

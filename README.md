@@ -1,4 +1,4 @@
-# FitTrack Application
+# Fitrack Application
 
 A fitness tracking application with Django backend and React frontend.
 

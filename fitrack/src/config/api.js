@@ -6,10 +6,13 @@ const getBaseUrl = () => {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return 'http://localhost:8000';
   }
-  
-  // For production - replace this with your deployed backend URL
-  // This should be the URL where your Django backend is hosted
-  return 'https://your-backend-url.com'; // Replace with your actual backend URL
+
+  // TEMPORARY SOLUTION: Use your local machine's IP address and port
+  // This allows your phone to connect to your laptop's backend when on the same network
+  return 'http://10.0.0.219:8000';
+
+  // PRODUCTION SOLUTION (uncomment when you deploy your backend):
+  // return 'https://your-deployed-backend-url.com';
 };
 
 // API endpoints

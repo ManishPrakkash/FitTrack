@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
+import { getApiUrl } from '@/config/api';
 
 const SignupPage = () => {
   const [name, setName] = useState('');
@@ -53,7 +54,7 @@ const SignupPage = () => {
     if (!isValid) return;
 
     try {
-      const res = await fetch('http://localhost:8000/api/register/', {
+      const res = await fetch(getApiUrl('register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
+import { getApiUrl } from '@/config/api';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -35,7 +36,7 @@ const LoginPage = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:8000/api/login/', {
+      const res = await fetch(getApiUrl('login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

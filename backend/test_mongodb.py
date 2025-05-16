@@ -1,44 +1,60 @@
-from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
+"""
+Test script to verify MongoDB connection.
+"""
+import pymongo
 import sys
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 def test_mongodb_connection():
     """Test connection to MongoDB."""
+    print("Testing MongoDB connection...")
+
+    # Check if we should use MongoDB Atlas
+    use_atlas = os.getenv('USE_MONGODB_ATLAS', 'False') == 'True'
+
+    if use_atlas:
+        print("Testing MongoDB Atlas connection...")
+        connection_string = os.getenv('MONGODB_URI', 'mongodb+srv://manishprakkash:HYeLg73wjj0593Gy@fitrack-db.9hmlhdb.mongodb.net/?retryWrites=true&w=majority&appName=fitrack-db')
+    else:
+        print("Testing local MongoDB connection...")
+        connection_string = 'mongodb://localhost:27017'
+
     try:
-        # Connect to MongoDB with a short timeout
-        client = MongoClient('mongodb://localhost:27017/', serverSelectionTimeoutMS=2000)
+        # Connect to MongoDB
+        client = pymongo.MongoClient(connection_string, serverSelectionTimeoutMS=5000)
 
-        # The ismaster command is cheap and does not require auth.
-        client.admin.command('ismaster')
+        # Verify connection
+        client.admin.command('ping')
+        print('MongoDB connection successful!')
 
-        # Get database and collection
-        db = client['fittrack_db']
-        users_collection = db['users']
+        # Get database information
+        db_names = client.list_database_names()
+        print(f"Available databases: {db_names}")
 
-        # Ensure the collection exists by inserting a test document if empty
-        if users_collection.count_documents({}) == 0:
-            print("Creating users collection...")
-            # This is just a test document, it will be removed
-            test_id = users_collection.insert_one({"test": True}).inserted_id
-            users_collection.delete_one({"_id": test_id})
+        # Create or access the fittrack_db database
+        db_name = os.getenv('MONGODB_NAME', 'fittrack_db')
+        db = client[db_name]
+        print(f"Using database: {db_name}")
 
-        # Count users
-        user_count = users_collection.count_documents({})
-
-        print("MongoDB Connection Successful!")
-        print(f"Database: fittrack_db")
-        print(f"Users Collection: users")
-        print(f"Number of users in database: {user_count}")
+        # List collections in the database
+        collections = db.list_collection_names()
+        print(f"Collections in {db_name}: {collections}")
 
         return True
-    except (ConnectionFailure, ServerSelectionTimeoutError):
-        print("MongoDB Connection Failed. Make sure MongoDB is running on localhost:27017")
-        return False
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f'MongoDB connection failed: {e}')
         return False
 
 if __name__ == "__main__":
     success = test_mongodb_connection()
-    # Exit with success even if MongoDB fails - we'll handle this gracefully
-    sys.exit(0)
+    if not success:
+        print("\nTroubleshooting tips:")
+        print("1. Make sure Docker is running")
+        print("2. Check if the MongoDB container is running: docker ps")
+        print("3. If needed, start the MongoDB container: docker-compose up -d")
+        print("4. If using MongoDB Atlas, check your network connection and firewall settings")
+        sys.exit(1)

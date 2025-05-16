@@ -19,7 +19,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fittrack-secret-key-change
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0,fitrack-backend.vercel.app').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -42,7 +42,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # CORS middleware should be as high as possible
+    'authentication.middleware.CorsMiddleware',  # Our custom CORS middleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -150,15 +151,17 @@ REST_FRAMEWORK = {
 }
 
 # CORS settings
-CORS_ALLOW_ALL_ORIGINS = True  # For development only
+# Use environment variable to determine if we should allow all origins (for local development)
+CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False') == 'True'
 
-# If you want to restrict origins in production, use this instead:
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:3000',
-#     'https://fitrack.vercel.app',
-#     'https://fitrack-app.vercel.app',
-#     # Add any other domains where your frontend is hosted
-# ]
+# Explicitly allow specific origins
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://fitrack-lime.vercel.app',
+    'https://fitrack.vercel.app',
+    'https://fitrack-app.vercel.app'
+]
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [

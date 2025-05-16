@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
-import { getApiUrl } from '@/config/api';
+import { useAuth } from '@/contexts/AuthContext.jsx';
 
 const SignupPage = () => {
   const [name, setName] = useState('');
@@ -16,7 +16,9 @@ const SignupPage = () => {
   const [nameError, setNameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,27 +55,31 @@ const SignupPage = () => {
 
     if (!isValid) return;
 
-    try {
-      const res = await fetch(getApiUrl('register'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
-      });
-      const data = await res.json();
+    setIsLoading(true);
 
-      if (data.success) {
-        navigate('/login');
+    try {
+      const result = await register(name, email, password);
+
+      if (result.success) {
+        // Redirect to login page after successful registration
+        navigate('/login', {
+          state: {
+            message: 'Registration successful! Please log in with your new account.'
+          }
+        });
       } else {
         // Handle different error types
-        if (data.error?.message?.includes('Email already exists')) {
+        if (result.error?.message?.includes('Email already exists')) {
           setEmailError('This email is already registered');
         } else {
-          setError(data.error?.message || 'Signup failed. Please try again.');
+          setError(result.error?.message || 'Signup failed. Please try again.');
         }
       }
     } catch (err) {
       console.error('Signup error:', err);
       setError(`Connection error: ${err.message || 'Unable to connect to the server'}. Please check your network connection and try again.`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -171,8 +177,12 @@ const SignupPage = () => {
               )}
             </div>
 
-            <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-              Sign Up
+            <Button
+              type="submit"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Creating Account...' : 'Sign Up'}
             </Button>
           </form>
           <p className="text-sm text-muted-foreground mt-4 text-center">

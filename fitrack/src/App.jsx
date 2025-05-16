@@ -11,6 +11,7 @@ import LoginPage from '@/pages/login.jsx';
 import SignupPage from '@/pages/signup.jsx';
 import { Toaster } from '@/components/ui/toaster.jsx';
 import { AnimatePresence, motion } from 'framer-motion';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext.jsx';
 
 const PageLayout = ({ children }) => {
   const location = useLocation();
@@ -28,11 +29,17 @@ const PageLayout = ({ children }) => {
 };
 
 const RequireAuth = ({ children }) => {
-  const isAuthenticated = !!localStorage.getItem('fittrack_user');
+  const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
+
   return children;
 };
 
@@ -55,7 +62,7 @@ const AppContent = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <Header key={localStorage.getItem('fitrack_user') ? 'logged-in' : 'logged-out'} />
+      <Header key={localStorage.getItem('fittrack_user') ? 'logged-in' : 'logged-out'} />
       <main className="flex-grow">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
@@ -87,7 +94,9 @@ const AppContent = () => {
 function App() {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   );
 }

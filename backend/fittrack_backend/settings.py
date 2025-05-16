@@ -150,7 +150,16 @@ REST_FRAMEWORK = {
 }
 
 # CORS settings
-CORS_ALLOW_ALL_ORIGINS = True  # For development only, restrict in production
+CORS_ALLOW_ALL_ORIGINS = True  # For development only
+
+# If you want to restrict origins in production, use this instead:
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:3000',
+#     'https://fitrack.vercel.app',
+#     'https://fitrack-app.vercel.app',
+#     # Add any other domains where your frontend is hosted
+# ]
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -174,4 +183,4 @@ CORS_ALLOW_HEADERS = [
 
 # JWT settings
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', SECRET_KEY)
-JWT_ACCESS_TOKEN_LIFETIME = timedelta(days=int(os.getenv('JWT_ACCESS_TOKEN_LIFETIME_DAYS', '1')))
+JWT_ACCESS_TOKEN_LIFETIME = timedelta(days=int(os.getenv('JWT_ACCESS_TOKEN_LIFETIME_DAYS', '30')))  # Increased to 30 days for better user experience

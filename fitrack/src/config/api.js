@@ -7,12 +7,9 @@ const getBaseUrl = () => {
     return 'http://localhost:8000';
   }
 
-  // TEMPORARY SOLUTION: Use your local machine's IP address and port
-  // This allows your phone to connect to your laptop's backend when on the same network
-  return 'http://10.0.0.219:8000';
-
-  // PRODUCTION SOLUTION (uncomment when you deploy your backend):
-  // return 'https://your-deployed-backend-url.com';
+  // For production deployment
+  // This will use the deployed backend URL when the app is hosted on Vercel
+  return process.env.REACT_APP_API_URL || 'https://fitrack-backend.vercel.app';
 };
 
 // API endpoints

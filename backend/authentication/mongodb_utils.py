@@ -37,9 +37,10 @@ def create_user(name, email, password):
 
 def get_user_by_email(email):
     """
-    Get user by email
+    Get user by email (case-insensitive)
     """
-    return users_collection.find_one({'email': email})
+    # Use regex with case-insensitive option for email lookup
+    return users_collection.find_one({'email': {'$regex': f'^{email}$', '$options': 'i'}})
 
 def authenticate_user(email, password):
     """

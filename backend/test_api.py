@@ -1,58 +1,81 @@
 """
-Script to test the API endpoints.
+Test script for the FitTrack API endpoints.
 """
 import requests
 import json
 
-def test_api():
-    """Test the API endpoints."""
-    base_url = "http://localhost:8000"
+# Base URL - change this to your deployed URL when testing production
+BASE_URL = "http://localhost:8000/api"
+
+def test_register():
+    """Test the registration endpoint."""
+    print("\n=== Testing Registration ===")
     
-    # Test registration
-    print("\nTesting registration endpoint...")
-    register_url = f"{base_url}/api/register/"
-    register_data = {
+    # Test data
+    data = {
         "name": "Test User",
         "email": "testuser@example.com",
-        "password": "testpassword"
+        "password": "testpassword123"
     }
     
-    try:
-        register_response = requests.post(register_url, json=register_data)
-        print(f"Status code: {register_response.status_code}")
-        print(f"Response: {register_response.json()}")
-    except Exception as e:
-        print(f"Error testing registration: {e}")
+    # Make the request
+    response = requests.post(f"{BASE_URL}/register/", json=data)
+    
+    # Print the response
+    print(f"Status Code: {response.status_code}")
+    print(f"Response: {json.dumps(response.json(), indent=2)}")
+    
+    return response.json()
+
+def test_login(email="testuser@example.com", password="testpassword123"):
+    """Test the login endpoint."""
+    print("\n=== Testing Login ===")
+    
+    # Test data
+    data = {
+        "email": email,
+        "password": password
+    }
+    
+    # Make the request
+    response = requests.post(f"{BASE_URL}/login/", json=data)
+    
+    # Print the response
+    print(f"Status Code: {response.status_code}")
+    print(f"Response: {json.dumps(response.json(), indent=2)}")
+    
+    return response.json()
+
+def test_validate_token(token):
+    """Test the token validation endpoint."""
+    print("\n=== Testing Token Validation ===")
+    
+    # Set headers with token
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    
+    # Make the request
+    response = requests.get(f"{BASE_URL}/validate-token/", headers=headers)
+    
+    # Print the response
+    print(f"Status Code: {response.status_code}")
+    print(f"Response: {json.dumps(response.json(), indent=2)}")
+    
+    return response.json()
+
+def run_tests():
+    """Run all tests."""
+    # Test registration
+    register_response = test_register()
     
     # Test login
-    print("\nTesting login endpoint...")
-    login_url = f"{base_url}/api/login/"
-    login_data = {
-        "email": "testuser@example.com",
-        "password": "testpassword"
-    }
+    login_response = test_login()
     
-    try:
-        login_response = requests.post(login_url, json=login_data)
-        print(f"Status code: {login_response.status_code}")
-        print(f"Response: {login_response.json()}")
-        
-        if login_response.status_code == 200:
-            token = login_response.json().get('token')
-            
-            # Test token validation
-            print("\nTesting token validation endpoint...")
-            validate_url = f"{base_url}/api/validate-token/"
-            headers = {"Authorization": f"Bearer {token}"}
-            
-            try:
-                validate_response = requests.get(validate_url, headers=headers)
-                print(f"Status code: {validate_response.status_code}")
-                print(f"Response: {validate_response.json()}")
-            except Exception as e:
-                print(f"Error testing token validation: {e}")
-    except Exception as e:
-        print(f"Error testing login: {e}")
+    # If login successful, test token validation
+    if login_response.get("success"):
+        token = login_response.get("token")
+        test_validate_token(token)
 
 if __name__ == "__main__":
-    test_api()
+    run_tests()

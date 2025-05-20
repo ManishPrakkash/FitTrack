@@ -58,7 +58,9 @@ const SignupPage = () => {
     setIsLoading(true);
 
     try {
+      console.log('Registering user with:', { name, email, password: '***' });
       const result = await register(name, email, password);
+      console.log('Registration result:', result);
 
       if (result.success) {
         // Redirect to login page after successful registration
@@ -69,10 +71,11 @@ const SignupPage = () => {
         });
       } else {
         // Handle different error types
+        console.error('Registration failed:', result);
         if (result.error?.message?.includes('Email already exists')) {
           setEmailError('This email is already registered');
         } else {
-          setError(result.error?.message || 'Signup failed. Please try again.');
+          setError(result.error?.message || result.message || 'Signup failed. Please try again.');
         }
       }
     } catch (err) {

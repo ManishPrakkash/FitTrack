@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>FitTrack API Test</h1>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Register User</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Name</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <button type="submit">Register</button>
+            </form>
+            <div id="registerResult" class="result"></div>
+        </div>
+        
+        <div class="card">
+            <h2>Login User</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+            <div id="loginResult" class="result"></div>
+        </div>
+        
+        <div class="card">
+            <h2>Validate Token</h2>
+            <form id="validateForm">
+                <div class="form-group">
+                    <label for="validateToken">Token</label>
+                    <input type="text" id="validateToken" required>
+                </div>
+                <button type="submit">Validate</button>
+            </form>
+            <div id="validateResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Base URL for the API
+        const BASE_URL = 'http://localhost:8000';
+        // const BASE_URL = 'https://fitrack-backend.vercel.app'; // For production
+
+        // Register form
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('registerResult');
+            resultDiv.innerHTML = 'Registering...';
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            try {
+                const response = await fetch(`${BASE_URL}/api/mongodb/register/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.status === 201) {
+                    resultDiv.innerHTML = `<span class="success">Registration successful!</span>\n\nResponse: ${JSON.stringify(data, null, 2)}`;
+                    // Auto-fill login form
+                    document.getElementById('loginEmail').value = email;
+                    document.getElementById('loginPassword').value = password;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">Registration failed!</span>\n\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            }
+        });
+        
+        // Login form
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = 'Logging in...';
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch(`${BASE_URL}/api/mongodb/login/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.status === 200) {
+                    resultDiv.innerHTML = `<span class="success">Login successful!</span>\n\nResponse: ${JSON.stringify(data, null, 2)}`;
+                    // Auto-fill validate form
+                    if (data.token) {
+                        document.getElementById('validateToken').value = data.token;
+                    }
+                } else {
+                    resultDiv.innerHTML = `<span class="error">Login failed!</span>\n\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            }
+        });
+        
+        // Validate token form
+        document.getElementById('validateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('validateResult');
+            resultDiv.innerHTML = 'Validating token...';
+            
+            const token = document.getElementById('validateToken').value;
+            
+            try {
+                const response = await fetch(`${BASE_URL}/api/mongodb/validate-token/`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.status === 200) {
+                    resultDiv.innerHTML = `<span class="success">Token is valid!</span>\n\nResponse: ${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">Token is invalid!</span>\n\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            }
+        });
+    </script>
+</body>
+</html>

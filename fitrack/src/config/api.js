@@ -16,15 +16,41 @@ const getBaseUrl = () => {
 const API = {
   baseUrl: getBaseUrl(),
   endpoints: {
+    // Authentication (Django)
     login: '/api/login/',
     register: '/api/register/',
-    // Add other endpoints as needed
+    'validate-token': '/api/validate-token/',
+    profile: '/api/profile/',
+
+    // MongoDB Authentication (Direct)
+    mongoLogin: '/api/mongodb/login/',
+    mongoRegister: '/api/mongodb/register/',
+    'mongo-validate-token': '/api/mongodb/validate-token/',
+
+    // Challenges
+    challenges: '/api/challenges/',
+    joinedChallenges: '/api/challenges/joined/',
+    availableChallenges: '/api/challenges/available/',
+    joinChallenge: (id) => `/api/challenges/${id}/join/`,
+    leaderboard: (id) => `/api/challenges/leaderboard/${id}/`,
+
+    // Activities
+    activities: '/api/activities/',
+    logActivity: '/api/activities/log/',
+    challengeActivities: '/api/activities/challenge/',
   }
 };
 
 // Helper function to get full URL for an endpoint
-export const getApiUrl = (endpoint) => {
-  return API.baseUrl + API.endpoints[endpoint];
+export const getApiUrl = (endpoint, ...args) => {
+  const endpointValue = API.endpoints[endpoint];
+
+  // If the endpoint is a function (like joinChallenge), call it with the provided args
+  if (typeof endpointValue === 'function') {
+    return API.baseUrl + endpointValue(...args);
+  }
+
+  return API.baseUrl + endpointValue;
 };
 
 export default API;

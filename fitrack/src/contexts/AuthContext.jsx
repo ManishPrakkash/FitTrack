@@ -19,11 +19,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedUser = localStorage.getItem('fittrack_user');
     const storedToken = localStorage.getItem('fittrack_token');
-    
+
     if (storedUser && storedToken) {
       setCurrentUser(JSON.parse(storedUser));
       setToken(storedToken);
-      
+
       // Validate token with backend
       validateToken(storedToken);
     } else {
@@ -34,20 +34,21 @@ export const AuthProvider = ({ children }) => {
   // Validate token with backend
   const validateToken = async (token) => {
     try {
-      const response = await fetch(getApiUrl('validate-token'), {
+      // Use MongoDB authentication endpoint
+      const response = await fetch(getApiUrl('mongo-validate-token'), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       const data = await response.json();
-      
+
       if (!data.success) {
         // Token is invalid, log out
         logout();
       }
-      
+
       setLoading(false);
     } catch (error) {
       console.error('Token validation error:', error);
@@ -58,36 +59,37 @@ export const AuthProvider = ({ children }) => {
   // Login function
   const login = async (email, password) => {
     try {
-      const response = await fetch(getApiUrl('login'), {
+      // Use MongoDB authentication endpoint
+      const response = await fetch(getApiUrl('mongoLogin'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         setCurrentUser(data.user);
         setToken(data.token);
-        
+
         // Store in localStorage
         localStorage.setItem('fittrack_user', JSON.stringify(data.user));
         localStorage.setItem('fittrack_token', data.token);
-        
+
         // Dispatch event for components that need to know about login
         window.dispatchEvent(new Event('userLogin'));
-        
+
         return { success: true };
       } else {
-        return { 
-          success: false, 
+        return {
+          success: false,
           message: data.message || 'Login failed'
         };
       }
     } catch (error) {
       console.error('Login error:', error);
-      return { 
-        success: false, 
+      return {
+        success: false,
         message: `Connection error: ${error.message || 'Unable to connect to the server'}`
       };
     }
@@ -96,23 +98,34 @@ export const AuthProvider = ({ children }) => {
   // Register function
   const register = async (name, email, password) => {
     try {
-      const response = await fetch(getApiUrl('register'), {
+      // Use MongoDB authentication endpoint
+      const url = getApiUrl('mongoRegister');
+      console.log('Registering at URL:', url);
+
+      const requestBody = JSON.stringify({ name, email, password });
+      console.log('Request body:', { name, email, password: '***' });
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: requestBody,
       });
-      
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries([...response.headers]));
+
       const data = await response.json();
-      
-      return { 
-        success: data.success, 
+      console.log('Response data:', data);
+
+      return {
+        success: data.success,
         message: data.message,
         error: data.error
       };
     } catch (error) {
       console.error('Registration error:', error);
-      return { 
-        success: false, 
+      return {
+        success: false,
         message: `Connection error: ${error.message || 'Unable to connect to the server'}`
       };
     }

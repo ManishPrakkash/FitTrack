@@ -4,25 +4,30 @@ Django settings for fittrack_backend project.
 
 import os
 from pathlib import Path
-from datetime import timedelta
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fittrack-secret-key-change-in-production')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-key-for-development-only')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0,fitrack-backend.vercel.app').split(',')
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'fitrack-backend.vercel.app']
 
 # Application definition
 INSTALLED_APPS = [
+    # Local apps first to ensure they're loaded before admin
+    'authentication',
+    'challenges',
+    'activities',
+
+    # Django built-in apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -33,17 +38,13 @@ INSTALLED_APPS = [
     # Third-party apps
     'rest_framework',
     'corsheaders',
-
-    # Local apps
-    'users',
-    'authentication',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # CORS middleware should be as high as possible
-    'authentication.middleware.CorsMiddleware',  # Our custom CORS middleware
+    'corsheaders.middleware.CorsMiddleware',
+    'cors_middleware.CorsMiddleware',  # Custom CORS middleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -72,35 +73,22 @@ TEMPLATES = [
 WSGI_APPLICATION = 'fittrack_backend.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# Try to use local MongoDB first, fall back to Atlas if specified
-USE_MONGODB_ATLAS = os.getenv('USE_MONGODB_ATLAS', 'False') == 'True'
-MONGODB_NAME = os.getenv('MONGODB_NAME', 'fittrack_db')
-
-if USE_MONGODB_ATLAS:
-    # MongoDB Atlas configuration
-    MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb+srv://manishprakkash:HYeLg73wjj0593Gy@fitrack-db.9hmlhdb.mongodb.net/?retryWrites=true&w=majority&appName=fitrack-db')
-    DATABASES = {
-        'default': {
-            'ENGINE': 'djongo',
-            'NAME': MONGODB_NAME,
-            'CLIENT': {
-                'host': MONGODB_URI,
-            }
-        }
+# Use MongoDB for production
+DATABASES = {
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'fittrack_db',
+        'CLIENT': {
+            'host': os.environ.get('MONGODB_URI', 'mongodb+srv://manishprakkash:HYeLg73wjj0593Gy@fitrack-db.9hmlhdb.mongodb.net/?retryWrites=true&w=majority&appName=fitrack-db'),
+            'username': os.environ.get('MONGODB_USERNAME', 'manishprakkash'),
+            'password': os.environ.get('MONGODB_PASSWORD', 'HYeLg73wjj0593Gy'),
+            'authSource': 'admin',
+            'authMechanism': 'SCRAM-SHA-1',
+        },
     }
-else:
-    # Local MongoDB configuration
-    DATABASES = {
-        'default': {
-            'ENGINE': 'djongo',
-            'NAME': MONGODB_NAME,
-            'CLIENT': {
-                'host': 'mongodb://localhost:27017',
-            }
-        }
-    }
+}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -109,9 +97,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 8,
-        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -134,8 +119,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Custom user model
-AUTH_USER_MODEL = 'users.User'
+# Using Django's built-in User model for now
+# AUTH_USER_MODEL = 'authentication.User'
 
 # REST Framework settings
 REST_FRAMEWORK = {
@@ -145,24 +130,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-    ],
 }
 
 # CORS settings
-# Use environment variable to determine if we should allow all origins (for local development)
-CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False') == 'True'
-
-# Explicitly allow specific origins
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'https://fitrack-lime.vercel.app',
-    'https://fitrack.vercel.app',
-    'https://fitrack-app.vercel.app'
-]
-
+CORS_ORIGIN_ALLOW_ALL = True  # Allow all origins during development
+CORS_ALLOW_ALL_ORIGINS = True  # For newer versions of django-cors-headers
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -184,6 +156,9 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-# JWT settings
-JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', SECRET_KEY)
-JWT_ACCESS_TOKEN_LIFETIME = timedelta(days=int(os.getenv('JWT_ACCESS_TOKEN_LIFETIME_DAYS', '30')))  # Increased to 30 days for better user experience
+# Add specific origins if needed
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'https://fitrack-lime.vercel.app',
+]

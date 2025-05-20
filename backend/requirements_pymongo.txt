@@ -1,0 +1,7 @@
+Django==4.2.10
+djangorestframework==3.14.0
+pymongo==3.12.3
+django-cors-headers==4.3.1
+python-dotenv==1.0.0
+PyJWT==2.8.0
+dnspython==2.4.2

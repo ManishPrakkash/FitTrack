@@ -1,0 +1,12 @@
+{
+  "name": "fitrack-backend",
+  "version": "1.0.0",
+  "description": "FitTrack Backend API",
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "start": "gunicorn fittrack_backend.wsgi:application",
+    "build": "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+  }
+}

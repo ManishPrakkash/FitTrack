@@ -1,1 +1,1 @@
-web: gunicorn fittrack_backend.wsgi --log-file -
+web: python -m gunicorn fittrack_backend.wsgi:application --log-file -

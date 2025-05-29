@@ -1,13 +1,11 @@
 [build]
 builder = "nixpacks"
-nixpacksPlan = "python"
 buildCommand = "pip install -r requirements.txt && python manage.py collectstatic --noinput"
 
 [deploy]
 startCommand = "gunicorn fittrack_backend.wsgi:application"
 healthcheckPath = "/"
 healthcheckTimeout = 100
-restartPolicyType = "on-failure"
 restartPolicyMaxRetries = 10
 
 [envs]

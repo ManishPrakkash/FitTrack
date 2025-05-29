@@ -1,13 +1,11 @@
 [build]
 builder = "nixpacks"
-nixpacksPlan = "node"
 buildCommand = "cd fitrack && rm -rf dist && npm ci && npm run build"
 
 [deploy]
 startCommand = "npm start"
 healthcheckPath = "/"
 healthcheckTimeout = 100
-restartPolicyType = "on-failure"
 restartPolicyMaxRetries = 10
 
 [envs]

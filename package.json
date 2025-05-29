@@ -1,6 +1,22 @@
 {
+  "name": "fitrack-project",
+  "version": "1.0.0",
+  "description": "FitTrack Project - Frontend and Backend",
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "start": "cd fitrack && npm start",
+    "build": "cd fitrack && npm install && npm run build",
+    "clean-build": "cd fitrack && rm -rf dist && npm run build",
+    "install-frontend": "cd fitrack && npm install",
+    "install-backend": "cd backend && pip install -r requirements.txt",
+    "dev-frontend": "cd fitrack && npm run dev",
+    "dev-backend": "cd backend && python manage.py runserver"
+  },
   "dependencies": {
     "mongodb": "^6.16.0",
     "node-fetch": "^3.3.2"
-  }
+  },
+  "private": true
 }

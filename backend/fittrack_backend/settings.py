@@ -75,20 +75,41 @@ WSGI_APPLICATION = 'fittrack_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# Use MongoDB for production
-DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'fittrack_db',
-        'CLIENT': {
-            'host': os.environ.get('MONGODB_URI', 'mongodb+srv://manishprakkash:HYeLg73wjj0593Gy@fitrack-db.9hmlhdb.mongodb.net/?retryWrites=true&w=majority&appName=fitrack-db'),
-            'username': os.environ.get('MONGODB_USERNAME', 'manishprakkash'),
-            'password': os.environ.get('MONGODB_PASSWORD', 'HYeLg73wjj0593Gy'),
-            'authSource': 'admin',
-            'authMechanism': 'SCRAM-SHA-1',
-        },
+# MongoDB connection with better timeout and retry settings
+MONGODB_URI = os.environ.get('MONGODB_URI', 'mongodb+srv://manishprakkash:HYeLg73wjj0593Gy@fitrack-db.9hmlhdb.mongodb.net/?retryWrites=true&w=majority&appName=fitrack-db&serverSelectionTimeoutMS=5000&connectTimeoutMS=10000&socketTimeoutMS=10000&maxPoolSize=10&retryReads=true')
+
+# Database configuration with fallback
+USE_MONGODB = os.environ.get('USE_MONGODB', 'True').lower() == 'true'
+
+if USE_MONGODB:
+    # Use MongoDB for production
+    DATABASES = {
+        'default': {
+            'ENGINE': 'djongo',
+            'NAME': 'fittrack_db',
+            'CLIENT': {
+                'host': MONGODB_URI,
+                'username': os.environ.get('MONGODB_USERNAME', 'manishprakkash'),
+                'password': os.environ.get('MONGODB_PASSWORD', 'HYeLg73wjj0593Gy'),
+                'authSource': 'admin',
+                'authMechanism': 'SCRAM-SHA-1',
+                'serverSelectionTimeoutMS': 5000,
+                'connectTimeoutMS': 10000,
+                'socketTimeoutMS': 10000,
+                'maxPoolSize': 10,
+                'retryWrites': True,
+                'retryReads': True,
+            },
+        }
     }
-}
+else:
+    # Fallback to SQLite for development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': str(BASE_DIR / 'db.sqlite3'),
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

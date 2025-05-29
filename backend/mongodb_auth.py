@@ -14,17 +14,34 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # MongoDB connection settings
-MONGODB_URI = os.environ.get('MONGODB_URI', 'mongodb+srv://manishprakkash:HYeLg73wjj0593Gy@fitrack-db.9hmlhdb.mongodb.net/?retryWrites=true&w=majority&appName=fitrack-db')
+MONGODB_URI = os.environ.get('MONGODB_URI', 'mongodb+srv://manishprakkash:HYeLg73wjj0593Gy@fitrack-db.9hmlhdb.mongodb.net/?retryWrites=true&w=majority&appName=fitrack-db&serverSelectionTimeoutMS=5000&connectTimeoutMS=10000&socketTimeoutMS=10000&maxPoolSize=10&retryReads=true')
 DB_NAME = 'fittrack_db'
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-key-for-development-only')
 
-# Connect to MongoDB
-client = MongoClient(MONGODB_URI)
-db = client[DB_NAME]
+# Connect to MongoDB with better error handling
+try:
+    client = MongoClient(
+        MONGODB_URI,
+        serverSelectionTimeoutMS=5000,
+        connectTimeoutMS=10000,
+        socketTimeoutMS=10000,
+        maxPoolSize=10,
+        retryWrites=True,
+        retryReads=True
+    )
+    # Test the connection
+    client.admin.command('ping')
+    db = client[DB_NAME]
+    print("✓ MongoDB connection successful")
+except Exception as e:
+    print(f"✗ MongoDB connection failed: {e}")
+    # Create a dummy client for development
+    client = None
+    db = None
 
 # Collections
-users_collection = db['users']
-profiles_collection = db['profiles']
+users_collection = db['users'] if db else None
+profiles_collection = db['profiles'] if db else None
 
 class JSONEncoder(json.JSONEncoder):
     """Custom JSON encoder that handles MongoDB ObjectId."""
@@ -50,9 +67,9 @@ def generate_token(user_id):
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7),
         'iat': datetime.datetime.utcnow()
     }
-    
+
     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-    
+
     return token
 
 def verify_token(token):
@@ -73,11 +90,11 @@ def register_user(name, email, password, username=None):
             'success': False,
             'message': 'Email already exists'
         }
-    
+
     # Create username if not provided
     if not username:
         username = email.split('@')[0]
-    
+
     # Create user document
     user = {
         'name': name,
@@ -87,10 +104,10 @@ def register_user(name, email, password, username=None):
         'date_joined': datetime.datetime.utcnow(),
         'is_active': True
     }
-    
+
     # Insert user
     user_id = users_collection.insert_one(user).inserted_id
-    
+
     # Create profile
     profile = {
         'user_id': user_id,
@@ -102,10 +119,10 @@ def register_user(name, email, password, username=None):
         'fitness_goal': None,
         'activity_level': None
     }
-    
+
     # Insert profile
     profiles_collection.insert_one(profile)
-    
+
     return {
         'success': True,
         'message': 'User registered successfully'
@@ -115,26 +132,26 @@ def login_user(email, password):
     """Login a user."""
     # Find user
     user = users_collection.find_one({'email': email})
-    
+
     if not user:
         return {
             'success': False,
             'message': 'User not found'
         }
-    
+
     # Verify password
     if not verify_password(user['password'], password):
         return {
             'success': False,
             'message': 'Invalid credentials'
         }
-    
+
     # Generate token
     token = generate_token(user['_id'])
-    
+
     # Get profile
     profile = profiles_collection.find_one({'user_id': user['_id']})
-    
+
     # Prepare user data
     user_data = {
         'id': str(user['_id']),
@@ -152,7 +169,7 @@ def login_user(email, password):
             'activity_level': profile.get('activity_level') if profile else None
         }
     }
-    
+
     return {
         'success': True,
         'token': token,
@@ -162,19 +179,19 @@ def login_user(email, password):
 def get_user_by_token(token):
     """Get user by token."""
     user_id = verify_token(token)
-    
+
     if not user_id:
         return None
-    
+
     # Find user
     user = users_collection.find_one({'_id': ObjectId(user_id)})
-    
+
     if not user:
         return None
-    
+
     # Get profile
     profile = profiles_collection.find_one({'user_id': user['_id']})
-    
+
     # Prepare user data
     user_data = {
         'id': str(user['_id']),
@@ -192,5 +209,5 @@ def get_user_by_token(token):
             'activity_level': profile.get('activity_level') if profile else None
         }
     }
-    
+
     return user_data

@@ -1,6 +1,6 @@
 [build]
-builder = "nixpacks"
-buildCommand = "cd fitrack && rm -rf dist && npm ci && npm run build"
+builder = "DOCKERFILE"
+# Using custom Dockerfile instead of nixpacks
 
 [deploy]
 startCommand = "npm start"

@@ -1,0 +1,8 @@
+models:
+  - id: openrouter-gpt
+    name: GPT-3.5 via OpenRouter
+    provider: openrouter
+    apiKey: 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
+    model: mistralai/mixtral-8x7b
+
+

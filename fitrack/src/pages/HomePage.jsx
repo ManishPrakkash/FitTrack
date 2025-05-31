@@ -128,26 +128,22 @@ const HomePage = () => {
       </section>
       {!user && (
         <div className="text-center mt-8">
-          <h1 className="text-5xl font-bold mb-6 text-foreground">Welcome to Fitrack</h1>
+          <h1 className="text-5xl font-bold mb-6 text-foreground">
+            Welcome to Fitrack
+          </h1>
           <p className="text-lg text-muted-foreground mb-8">
             Track your fitness goals, join challenges, and compete on the leaderboard.
           </p>
-          <div className="space-x-4">
-            <Link to="/login" className="bg-primary text-primary-foreground px-6 py-3 rounded hover:bg-primary/90">
-              Login
-            </Link>
-            <Link to="/signup" className="bg-secondary text-secondary-foreground px-6 py-3 rounded hover:bg-secondary/90">
-              Sign Up
-            </Link>
-          </div>
         </div>
       )}
 
       {user && (
         <div className="text-center mt-8">
-          <h1 className="text-5xl font-bold mb-6 text-foreground">Welcome back, {user.name}!</h1>
+          <h1 className="text-5xl font-bold mb-6 text-foreground">
+            Welcome back, {user.name?.toLowerCase() || 'user'}
+          </h1>
           <p className="text-lg text-muted-foreground mb-8">
-            Continue your fitness journey, join new challenges, or check your progress.
+            Track your fitness goals, join challenges, and compete on the leaderboard.
           </p>
         </div>
       )}

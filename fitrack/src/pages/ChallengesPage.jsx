@@ -1,5 +1,4 @@
-
-    import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
     import ChallengeCard from '@/components/ChallengeCard.jsx';
     import ActivityLogModal from '@/components/ActivityLogModal.jsx';
     import { useLocalStorage } from '@/hooks/useLocalStorage.jsx';
@@ -62,19 +61,19 @@
           transition={{ duration: 0.5 }}
         >
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-4xl font-bold text-foreground">Fitness Challenges</h1>
+            <h1 className="text-4xl font-extrabold text-foreground tracking-tight">Fitness Challenges</h1>
             <Link to="/admin">
-              <Button variant="outline">
+              <Button variant="outline" className="premium-btn font-semibold">
                 <PlusCircle className="mr-2 h-4 w-4" /> Create Challenge
               </Button>
             </Link>
           </div>
-
+          <div className="accent-line mb-6" />
           <Tabs defaultValue="all" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 mb-6">
-              <TabsTrigger value="all">All Challenges</TabsTrigger>
-              <TabsTrigger value="joined">My Challenges</TabsTrigger>
-              <TabsTrigger value="available">Available</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 mb-6 bg-background border border-accent/30 rounded-lg">
+              <TabsTrigger value="all" className="font-semibold">All Challenges</TabsTrigger>
+              <TabsTrigger value="joined" className="font-semibold">My Challenges</TabsTrigger>
+              <TabsTrigger value="available" className="font-semibold">Available</TabsTrigger>
             </TabsList>
             <AnimatePresence mode="wait">
               <TabsContent value="all">
@@ -87,7 +86,7 @@
                   className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
                   {challenges.length === 0 ? (
-                     <p className="text-muted-foreground col-span-full text-center py-10">No challenges available yet. Admins can create new ones!</p>
+                    <p className="text-muted-foreground col-span-full text-center py-10">No challenges available yet. Admins can create new ones!</p>
                   ) : (
                     challenges.map(challenge => (
                       <ChallengeCard
@@ -95,7 +94,7 @@
                         challenge={challenge}
                         onJoin={handleJoinChallenge}
                         onLogActivity={openLogModal}
-                        isJoined={userProgress[challenge.id]?.joined || false}
+                        isJoined={!!userProgress[challenge.id]?.joined}
                         progress={calculateProgressPercent(challenge.id)}
                       />
                     ))
@@ -112,7 +111,7 @@
                   className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
                   {joinedChallenges.length === 0 ? (
-                    <p className="text-muted-foreground col-span-full text-center py-10">You haven't joined any challenges yet. Explore available challenges!</p>
+                    <p className="text-muted-foreground col-span-full text-center py-10">You haven't joined any challenges yet.</p>
                   ) : (
                     joinedChallenges.map(challenge => (
                       <ChallengeCard
@@ -120,7 +119,7 @@
                         challenge={challenge}
                         onJoin={handleJoinChallenge}
                         onLogActivity={openLogModal}
-                        isJoined={true}
+                        isJoined={!!userProgress[challenge.id]?.joined}
                         progress={calculateProgressPercent(challenge.id)}
                       />
                     ))
@@ -136,10 +135,8 @@
                   transition={{ duration: 0.3 }}
                   className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
-                   {availableChallenges.length === 0 && challenges.length > 0 ? (
-                    <p className="text-muted-foreground col-span-full text-center py-10">You've joined all available challenges! Great job!</p>
-                  ) : availableChallenges.length === 0 && challenges.length === 0 ? (
-                     <p className="text-muted-foreground col-span-full text-center py-10">No challenges available to join at the moment.</p>
+                  {availableChallenges.length === 0 ? (
+                    <p className="text-muted-foreground col-span-full text-center py-10">No available challenges. Join or create a new one!</p>
                   ) : (
                     availableChallenges.map(challenge => (
                       <ChallengeCard
@@ -147,7 +144,7 @@
                         challenge={challenge}
                         onJoin={handleJoinChallenge}
                         onLogActivity={openLogModal}
-                        isJoined={false}
+                        isJoined={!!userProgress[challenge.id]?.joined}
                         progress={calculateProgressPercent(challenge.id)}
                       />
                     ))
@@ -156,18 +153,14 @@
               </TabsContent>
             </AnimatePresence>
           </Tabs>
-
-          {selectedChallenge && (
-            <ActivityLogModal
-              challenge={selectedChallenge}
-              isOpen={isModalOpen}
-              setIsOpen={setIsModalOpen}
-              onLog={handleLogActivity}
-            />
-          )}
+          <ActivityLogModal
+            challenge={selectedChallenge}
+            isOpen={isModalOpen}
+            setIsOpen={setIsModalOpen}
+            onLog={handleLogActivity}
+          />
         </motion.div>
       );
     };
 
     export default ChallengesPage;
-  

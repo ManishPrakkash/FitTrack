@@ -1,5 +1,4 @@
-
-    import React from 'react';
+import React from 'react';
     import CreateChallengeForm from '@/components/CreateChallengeForm.jsx';
     import { useLocalStorage } from '@/hooks/useLocalStorage.jsx';
     import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card.jsx';
@@ -53,17 +52,17 @@
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-4xl font-bold mb-8 text-foreground">Admin Dashboard</h1>
-          
+          <h1 className="text-4xl font-extrabold mb-8 text-foreground tracking-tight">Admin Dashboard</h1>
+          <div className="accent-line mb-8" />
           <div className="grid md:grid-cols-2 gap-8">
             <section>
               <CreateChallengeForm onCreateChallenge={handleCreateChallenge} />
             </section>
-
             <section>
-              <Card>
+              <Card className="glass-card premium-shadow border border-border">
                 <CardHeader>
-                  <CardTitle>Manage Challenges</CardTitle>
+                  <CardTitle className="font-bold">Manage Challenges</CardTitle>
+                  <div className="accent-line mb-2" />
                   <CardDescription>View, edit, or delete existing challenges.</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -77,38 +76,28 @@
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.3 }}
-                          className="flex items-center justify-between p-4 border rounded-lg bg-secondary/20 hover:bg-secondary/40 transition-colors"
+                          className="flex items-center justify-between p-4 border rounded-lg bg-secondary/20 hover:bg-secondary/40 transition-colors premium-shadow"
                         >
-                          <div>
-                            <h3 className="font-semibold text-foreground">{challenge.name}</h3>
-                            <p className="text-sm text-muted-foreground">{challenge.type} - {challenge.goal} {challenge.unit}</p>
-                          </div>
-                          <div className="flex space-x-2">
-                             <Button variant="ghost" size="icon" onClick={() => handleEditChallenge(challenge.id)} title="Edit Challenge (Not Implemented)">
-                              <Edit3 className="h-4 w-4" />
-                            </Button>
+                          <span className="font-semibold text-foreground">{challenge.name}</span>
+                          <div className="flex items-center gap-2">
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10" title="Delete Challenge">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <Button variant="destructive" size="sm" className="premium-btn">Delete</Button>
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                  <AlertDialogTitle>Delete Challenge</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently delete the challenge
-                                    "{challenge.name}".
+                                    Are you sure you want to delete this challenge? This action cannot be undone.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleDeleteChallenge(challenge.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                    Delete
-                                  </AlertDialogAction>
+                                  <AlertDialogAction onClick={() => handleDeleteChallenge(challenge.id)} className="premium-btn">Delete</AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
                             </AlertDialog>
+                            <Button variant="outline" size="sm" className="premium-btn" onClick={() => handleEditChallenge(challenge.id)}>Edit</Button>
                           </div>
                         </motion.li>
                       ))}
@@ -123,4 +112,3 @@
     };
 
     export default AdminPage;
-  

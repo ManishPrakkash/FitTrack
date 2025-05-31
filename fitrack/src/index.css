@@ -1,95 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
+@layer base {
+  :root {
+    --background: 0 0% 6%; /* Deep black */
+    --foreground: 0 0% 98%; /* White */
+    --card: 0 0% 10%; /* Slightly lighter black for cards */
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%; /* White */
+    --primary-foreground: 0 0% 10%; /* Black text on white */
+    --secondary: 0 0% 16%; /* Dark gray for secondary elements */
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 22%; /* Muted gray */
+    --muted-foreground: 0 0% 70%; /* Lighter gray text */
+    --accent: 0 0% 98%; /* White accent lines */
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 18%; /* Subtle border */
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 40%; /* Slightly lighter for focus */
+    --radius: 0.5rem;
+    --accent-line: 0 0% 98%; /* White accent line */
+  }
+}
 
-    @layer base {
-      :root {
-        --background: 0 0% 3.9%; /* Almost black */
-        --foreground: 0 0% 98%; /* Almost white */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    letter-spacing: 0.01em;
+    font-size: 1.05rem;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+    letter-spacing: 0.01em;
+  }
+  /* Accent line utility - animated gradient */
+  .accent-line {
+    border-bottom: 2.5px solid transparent;
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+    width: 3.5rem;
+    margin-left: auto;
+    margin-right: auto;
+    background: linear-gradient(90deg, hsl(var(--accent-line)), hsl(var(--muted)) 60%, hsl(var(--accent-line)));
+    background-size: 200% 100%;
+    animation: accent-move 2.5s linear infinite;
+  }
+  @keyframes accent-move {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+  }
+}
 
-        --card: 0 0% 5.9%; /* Slightly lighter black for cards */
-        --card-foreground: 0 0% 98%;
+/* Custom scrollbar for a cleaner, more premium look */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: linear-gradient(90deg, hsl(var(--background)), hsl(var(--muted)) 80%);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(120deg, hsl(var(--muted)), hsl(var(--secondary)) 80%);
+  border-radius: 10px;
+  border: 2px solid hsl(var(--background));
+  transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, hsl(var(--accent)), hsl(var(--secondary)) 80%);
+}
 
-        --popover: 0 0% 5.9%;
-        --popover-foreground: 0 0% 98%;
+/* Card shadow for premium look */
+.premium-shadow {
+  box-shadow: 0 4px 32px 0 rgba(255,255,255,0.08), 0 2px 0 0 hsl(var(--accent-line));
+}
 
-        --primary: 0 0% 98%; /* Primary actions/elements: white */
-        --primary-foreground: 0 0% 9%; /* Text on primary elements: black */
-        
-        --secondary: 0 0% 14.9%; /* Dark gray for secondary elements */
-        --secondary-foreground: 0 0% 98%; /* White text on dark gray */
+/* Glassmorphism for cards - deeper, more premium */
+.glass-card {
+  background: rgba(24,24,24,0.92);
+  backdrop-filter: blur(6px) saturate(1.2);
+  border: 1.5px solid hsl(var(--border));
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+  transition: box-shadow 0.2s, background 0.2s;
+}
+.glass-card:hover {
+  background: rgba(32,32,32,0.98);
+  box-shadow: 0 12px 40px 0 rgba(0,0,0,0.22);
+}
 
-        --muted: 0 0% 14.9%;
-        --muted-foreground: 0 0% 63.9%; /* Lighter gray text for muted content */
-
-        --accent: 0 0% 14.9%;
-        --accent-foreground: 0 0% 98%;
-
-        --destructive: 0 84.2% 60.2%; /* Standard red for destructive actions */
-        --destructive-foreground: 0 0% 98%;
-
-        --border: 0 0% 14.9%; /* Dark gray borders */
-        --input: 0 0% 14.9%; /* Dark gray input backgrounds */
-        --ring: 0 0% 25%; /* Slightly lighter gray for focus rings */
-
-        --radius: 0.5rem;
-      }
-
-      .dark {
-        --background: 0 0% 3.9%;
-        --foreground: 0 0% 98%;
-
-        --card: 0 0% 5.9%;
-        --card-foreground: 0 0% 98%;
-
-        --popover: 0 0% 5.9%;
-        --popover-foreground: 0 0% 98%;
-
-        --primary: 0 0% 98%;
-        --primary-foreground: 0 0% 9%;
-        
-        --secondary: 0 0% 14.9%;
-        --secondary-foreground: 0 0% 98%;
-
-        --muted: 0 0% 14.9%;
-        --muted-foreground: 0 0% 63.9%;
-
-        --accent: 0 0% 14.9%;
-        --accent-foreground: 0 0% 98%;
-
-        --destructive: 0 62.8% 30.6%;
-        --destructive-foreground: 0 0% 98%;
-
-        --border: 0 0% 14.9%;
-        --input: 0 0% 14.9%;
-        --ring: 0 0% 25%;
-      }
-    }
-
-    @layer base {
-      * {
-        @apply border-border;
-      }
-      body {
-        @apply bg-background text-foreground;
-        font-feature-settings: "rlig" 1, "calt" 1;
-      }
-    }
-
-    /* Custom scrollbar for a cleaner look */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: hsl(var(--background));
-    }
-    ::-webkit-scrollbar-thumb {
-      background: hsl(var(--muted));
-      border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: hsl(var(--secondary));
-    }
-  
+/* Premium button hover - more contrast, subtle animation */
+.premium-btn {
+  transition: background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s;
+  border-bottom: 2.5px solid hsl(var(--accent-line));
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  box-shadow: 0 1.5px 0 0 hsl(var(--accent-line));
+  background: linear-gradient(90deg, hsl(var(--background)), hsl(var(--muted)) 80%);
+}
+.premium-btn:hover {
+  background: linear-gradient(90deg, hsl(var(--accent)), hsl(var(--secondary)) 80%);
+  color: hsl(var(--primary-foreground));
+  border-bottom: 2.5px solid hsl(var(--primary));
+  box-shadow: 0 4px 16px 0 rgba(255,255,255,0.10);
+}

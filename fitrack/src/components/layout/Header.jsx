@@ -1,5 +1,4 @@
-
-    import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
     import { Link, NavLink, useNavigate } from 'react-router-dom';
     import { Dumbbell, Home, Trophy, ShieldCheck, Users, LogOut } from 'lucide-react';
     import { Button } from '@/components/ui/button.jsx';
@@ -81,18 +80,16 @@
         if (userData) {
           setUser(JSON.parse(userData));
         }
-
         // Listen for login events
         const handleUserLogin = () => {
           const userData = localStorage.getItem('fittrack_user');
           if (userData) {
             setUser(JSON.parse(userData));
+          } else {
+            setUser(null);
           }
         };
-
         window.addEventListener('userLogin', handleUserLogin);
-
-        // Cleanup event listener on component unmount
         return () => {
           window.removeEventListener('userLogin', handleUserLogin);
         };
@@ -101,7 +98,6 @@
       const handleLogout = () => {
         localStorage.removeItem('fittrack_user');
         setUser(null);
-        // Dispatch event to notify other components
         window.dispatchEvent(new Event('userLogin'));
         navigate('/login');
       };
@@ -110,38 +106,35 @@
         <motion.header
           initial={{ y: -100 }}
           animate={{ y: 0 }}
-          transition={{ type: "spring", stiffness: 120, damping: 20 }}
-          className="bg-card border-b border-border shadow-sm sticky top-0 z-40"
+          transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+          className="bg-card/80 glass-card border-b border-border shadow-lg sticky top-0 z-40 backdrop-blur-md"
+          style={{ boxShadow: '0 2px 24px 0 rgba(255,255,255,0.04), 0 2px 0 0 hsl(var(--accent-line))' }}
         >
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <Link to="/" className="flex items-center text-2xl font-bold text-foreground">
-                <Dumbbell className="h-8 w-8 mr-2 text-primary" />
-                Fitrack
-              </Link>
-
-              {user ? (
-                <div className="flex items-center">
-                  <nav className="flex items-center space-x-2 sm:space-x-4 mr-4">
-                    <NavItem to="/" icon={Home}>Home</NavItem>
-                    <NavItem to="/challenges" icon={Trophy}>Challenges</NavItem>
-                    <NavItem to="/leaderboard" icon={Users}>Leaderboard</NavItem>
-                    <NavItem to="/admin" icon={ShieldCheck}>Admin</NavItem>
-                  </nav>
-                  <ProfileMenu user={user} onLogout={handleLogout} />
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <Link to="/login">
-                    <Button variant="secondary" size="sm">Login</Button>
-                  </Link>
-                  <Link to="/signup">
-                    <Button variant="primary" size="sm">Sign Up</Button>
-                  </Link>
-                </div>
-              )}
-            </div>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+            <Link to="/" className="flex items-center text-2xl font-bold text-foreground tracking-tight select-none">
+              <Dumbbell className="h-8 w-8 mr-2 text-primary" />
+              <span className="font-extrabold uppercase tracking-widest">Fitrack</span>
+            </Link>
+            <nav className="flex items-center space-x-2 sm:space-x-4">
+              <NavItem to="/" icon={Home}>Home</NavItem>
+              <NavItem to="/challenges" icon={Trophy}>Challenges</NavItem>
+              <NavItem to="/leaderboard" icon={Users}>Leaderboard</NavItem>
+              <NavItem to="/admin" icon={ShieldCheck}>Admin</NavItem>
+            </nav>
+            {user ? (
+              <ProfileMenu user={user} onLogout={handleLogout} />
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Link to="/login">
+                  <Button variant="secondary" size="sm" className="premium-btn">Login</Button>
+                </Link>
+                <Link to="/signup">
+                  <Button variant="primary" size="sm" className="premium-btn">Sign Up</Button>
+                </Link>
+              </div>
+            )}
           </div>
+          <div className="accent-line" />
         </motion.header>
       );
     };

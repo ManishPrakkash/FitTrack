@@ -94,10 +94,11 @@ const SignupPage = () => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md glass-card premium-shadow border border-border">
         <CardHeader>
-          <CardTitle>Sign Up</CardTitle>
-          <CardDescription>Create your Fitrack account</CardDescription>
+          <CardTitle className="text-3xl font-bold tracking-tight mb-1">Sign Up</CardTitle>
+          <div className="accent-line mb-2" />
+          <CardDescription className="text-base text-muted-foreground">Create your Fitrack account</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
@@ -106,7 +107,6 @@ const SignupPage = () => {
               {error}
             </div>
           )}
-
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
@@ -120,9 +120,7 @@ const SignupPage = () => {
                 }}
                 placeholder="Enter your name"
                 autoComplete="name"
-                className={`bg-secondary/10 border ${
-                  nameError ? 'border-destructive' : 'border-secondary/50'
-                } text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary`}
+                className={`bg-background border border-accent/30 text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary rounded-md`}
               />
               {nameError && (
                 <div className="text-destructive text-sm flex items-center mt-1">
@@ -131,7 +129,6 @@ const SignupPage = () => {
                 </div>
               )}
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -144,9 +141,7 @@ const SignupPage = () => {
                 }}
                 placeholder="Enter your email"
                 autoComplete="email"
-                className={`bg-secondary/10 border ${
-                  emailError ? 'border-destructive' : 'border-secondary/50'
-                } text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary`}
+                className={`bg-background border border-accent/30 text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary rounded-md`}
               />
               {emailError && (
                 <div className="text-destructive text-sm flex items-center mt-1">
@@ -155,7 +150,6 @@ const SignupPage = () => {
                 </div>
               )}
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -168,9 +162,7 @@ const SignupPage = () => {
                 }}
                 placeholder="Enter your password"
                 autoComplete="new-password"
-                className={`bg-secondary/10 border ${
-                  passwordError ? 'border-destructive' : 'border-secondary/50'
-                } text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary`}
+                className={`bg-background border border-accent/30 text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary rounded-md`}
               />
               {passwordError && (
                 <div className="text-destructive text-sm flex items-center mt-1">
@@ -179,10 +171,9 @@ const SignupPage = () => {
                 </div>
               )}
             </div>
-
             <Button
               type="submit"
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full premium-btn bg-primary text-primary-foreground hover:bg-primary/90 text-base font-semibold tracking-wide rounded-md"
               disabled={isLoading}
             >
               {isLoading ? 'Creating Account...' : 'Sign Up'}
@@ -190,7 +181,7 @@ const SignupPage = () => {
           </form>
           <p className="text-sm text-muted-foreground mt-4 text-center">
             Already have an account?{' '}
-            <Link to="/login" className="text-primary hover:underline">
+            <Link to="/login" className="text-primary hover:underline font-semibold">
               Login
             </Link>
           </p>

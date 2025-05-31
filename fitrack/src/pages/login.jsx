@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button.jsx';
 import { Input } from '@/components/ui/input.jsx';
@@ -86,10 +85,11 @@ const LoginPage = () => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md glass-card premium-shadow border border-border">
         <CardHeader>
-          <CardTitle>Login</CardTitle>
-          <CardDescription>Access your Fitrack account</CardDescription>
+          <CardTitle className="text-3xl font-bold tracking-tight mb-1">Login</CardTitle>
+          <div className="accent-line mb-2" />
+          <CardDescription className="text-base text-muted-foreground">Access your Fitrack account</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
@@ -98,7 +98,6 @@ const LoginPage = () => {
               {error}
             </div>
           )}
-
           {success && (
             <div className="bg-green-100 text-green-800 text-sm p-3 rounded-md flex items-center mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -107,7 +106,6 @@ const LoginPage = () => {
               {success}
             </div>
           )}
-
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -121,9 +119,7 @@ const LoginPage = () => {
                 }}
                 placeholder="Enter your email"
                 autoComplete="email"
-                className={`bg-secondary/10 border ${
-                  emailError ? 'border-destructive' : 'border-secondary/50'
-                } text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary`}
+                className={`bg-background border border-accent/30 text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary rounded-md`}
               />
               {emailError && (
                 <div className="text-destructive text-sm flex items-center mt-1">
@@ -132,7 +128,6 @@ const LoginPage = () => {
                 </div>
               )}
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -145,9 +140,7 @@ const LoginPage = () => {
                 }}
                 placeholder="Enter your password"
                 autoComplete="current-password"
-                className={`bg-secondary/10 border ${
-                  passwordError ? 'border-destructive' : 'border-secondary/50'
-                } text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary`}
+                className={`bg-background border border-accent/30 text-foreground placeholder-muted-foreground focus:ring-primary focus:border-primary rounded-md`}
               />
               {passwordError && (
                 <div className="text-destructive text-sm flex items-center mt-1">
@@ -156,10 +149,9 @@ const LoginPage = () => {
                 </div>
               )}
             </div>
-
             <Button
               type="submit"
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full premium-btn bg-primary text-primary-foreground hover:bg-primary/90 text-base font-semibold tracking-wide rounded-md"
               disabled={isLoading}
             >
               {isLoading ? 'Logging in...' : 'Login'}
@@ -167,7 +159,7 @@ const LoginPage = () => {
           </form>
           <p className="text-sm text-muted-foreground mt-4 text-center">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-primary hover:underline">
+            <Link to="/signup" className="text-primary hover:underline font-semibold">
               Sign Up
             </Link>
           </p>

@@ -1,5 +1,4 @@
-
-    import React from 'react';
+import React from 'react';
     import { Link } from 'react-router-dom';
     import { Button } from '@/components/ui/button.jsx';
     import { Frown } from 'lucide-react';
@@ -14,12 +13,13 @@
           transition={{ duration: 0.5 }}
         >
           <Frown className="w-32 h-32 text-primary mb-8" />
-          <h1 className="text-6xl font-bold text-foreground mb-4">404</h1>
-          <p className="text-2xl text-muted-foreground mb-8">
+          <h1 className="text-6xl font-extrabold text-foreground mb-2 tracking-tight">404</h1>
+          <div className="accent-line mb-4" />
+          <p className="text-2xl text-muted-foreground mb-8 font-medium">
             Oops! The page you're looking for doesn't exist.
           </p>
           <Link to="/">
-            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button size="lg" className="premium-btn bg-background text-foreground border border-accent px-8 py-4 text-lg font-semibold uppercase tracking-wider shadow-md hover:bg-foreground hover:text-background transition-colors">
               Go Back Home
             </Button>
           </Link>
@@ -28,4 +28,3 @@
     };
 
     export default NotFoundPage;
-  

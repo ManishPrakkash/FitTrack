@@ -17,4 +17,8 @@ urlpatterns = [
 
     # Direct MongoDB authentication endpoints
     path('api/mongodb/', include('mongodb_auth_urls')),
+
+    # MongoDB-based challenge and activity endpoints
+    path('api/mongodb/challenges/', include('mongodb_challenge_urls')),
+    path('api/mongodb/activities/', include('mongodb_activity_urls')),
 ]

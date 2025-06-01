@@ -48,8 +48,10 @@ class JWTAuthentication(authentication.BaseAuthentication):
             
             # Get the user
             user_id = payload['id']
-            user = User.objects.get(id=user_id)
-            
+            try:
+                user = User.objects.get(id=int(user_id))
+            except (ValueError, TypeError):
+                raise AuthenticationFailed('Invalid user id in token.')
             return (user, token)
             
         except jwt.ExpiredSignatureError:

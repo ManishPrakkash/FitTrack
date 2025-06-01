@@ -27,6 +27,21 @@ const API = {
     mongoRegister: '/api/mongodb/register/',
     'mongo-validate-token': '/api/mongodb/validate-token/',
 
+    // MongoDB Challenges (Direct)
+    mongoChallenges: '/api/mongodb/challenges/',
+    mongoCreateChallenge: '/api/mongodb/challenges/',
+    mongoChallengeDetail: (id) => `/api/mongodb/challenges/${id}/`,
+    mongoUpdateChallenge: (id) => `/api/mongodb/challenges/${id}/`,
+    mongoDeleteChallenge: (id) => `/api/mongodb/challenges/${id}/`,
+    mongoJoinChallenge: (id) => `/api/mongodb/challenges/${id}/join/`,
+    mongoLeaderboard: (id) => `/api/mongodb/challenges/${id}/leaderboard/`,
+
+    // MongoDB Activities (Direct)
+    mongoActivities: '/api/mongodb/activities/',
+    mongoLogActivity: '/api/mongodb/activities/',
+    mongoChallengeActivities: (id) => `/api/mongodb/activities/challenge/${id}/`,
+    mongoLogToChallenge: (id) => `/api/mongodb/activities/log/${id}/`,
+
     // Challenges
     challenges: '/api/challenges/',
     joinedChallenges: '/api/challenges/joined/',

@@ -15,6 +15,8 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext.jsx';
 
 const PageLayout = ({ children }) => {
   const location = useLocation();
+  // Hide header on login and signup pages
+  const hideHeader = location.pathname === '/login' || location.pathname === '/signup';
   return (
     <motion.div
       key={location.pathname}
@@ -23,6 +25,7 @@ const PageLayout = ({ children }) => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
+      {!hideHeader && <Header />}
       {children}
     </motion.div>
   );
@@ -62,7 +65,6 @@ const AppContent = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <Header key={localStorage.getItem('fittrack_user') ? 'logged-in' : 'logged-out'} />
       <main className="flex-grow">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>

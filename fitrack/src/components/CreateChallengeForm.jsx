@@ -6,6 +6,7 @@
     import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card.jsx';
     import { useToast } from '@/components/ui/use-toast.jsx';
     import { motion } from 'framer-motion';
+    import { getApiUrl } from '@/config/api.js';
 
     const CreateChallengeForm = ({ onCreateChallenge }) => {
       const [name, setName] = useState('');
@@ -13,9 +14,10 @@
       const [description, setDescription] = useState('');
       const [goal, setGoal] = useState('');
       const [unit, setUnit] = useState('km');
+      const [isLoading, setIsLoading] = useState(false);
       const { toast } = useToast();
 
-      const handleSubmit = (e) => {
+      const handleSubmit = async (e) => {
         e.preventDefault();
         if (!name || !description || !goal || isNaN(parseFloat(goal)) || parseFloat(goal) <= 0) {
            toast({
@@ -25,26 +27,70 @@
           });
           return;
         }
-        const newChallenge = {
-          id: Date.now().toString(),
-          name,
-          type,
-          description,
-          goal: parseFloat(goal),
-          unit,
-          participants: 0,
-          createdAt: new Date().toISOString(),
-        };
-        onCreateChallenge(newChallenge);
-        toast({
-          title: "Challenge Created!",
-          description: `Successfully created challenge: ${name}.`,
-        });
-        setName('');
-        setType('Walking');
-        setDescription('');
-        setGoal('');
-        setUnit('km');
+
+        setIsLoading(true);
+
+        try {
+          // Get token from localStorage
+          const token = localStorage.getItem('fittrack_token');
+          if (!token) {
+            toast({
+              title: "Authentication Required",
+              description: "Please log in to create challenges.",
+              variant: "destructive",
+            });
+            setIsLoading(false);
+            return;
+          }
+
+          // Create challenge via API
+          const response = await fetch(getApiUrl('mongoCreateChallenge'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              name,
+              type,
+              description,
+              goal: parseFloat(goal),
+              unit,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            onCreateChallenge(data.data);
+            toast({
+              title: "Challenge Created!",
+              description: `Successfully created challenge: ${name}.`,
+            });
+
+            // Reset form
+            setName('');
+            setType('Walking');
+            setDescription('');
+            setGoal('');
+            setUnit('km');
+          } else {
+            toast({
+              title: "Error Creating Challenge",
+              description: data.message || "Failed to create challenge.",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+          console.error('Error creating challenge:', error);
+          toast({
+            title: "Network Error",
+            description: "Failed to connect to server. Please try again.",
+            variant: "destructive",
+          });
+        } finally {
+          setIsLoading(false);
+        }
       };
 
       return (
@@ -100,7 +146,13 @@
                     </select>
                   </div>
                 </div>
-                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Create Challenge</Button>
+                <Button
+                  type="submit"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Creating...' : 'Create Challenge'}
+                </Button>
               </form>
             </CardContent>
           </Card>

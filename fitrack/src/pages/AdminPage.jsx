@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
     import CreateChallengeForm from '@/components/CreateChallengeForm.jsx';
-    import { useLocalStorage } from '@/hooks/useLocalStorage.jsx';
     import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card.jsx';
     import { Button } from '@/components/ui/button.jsx';
     import { Trash2, Edit3, Eye } from 'lucide-react';
@@ -15,25 +14,94 @@ import React from 'react';
       AlertDialogHeader,
       AlertDialogTitle,
       AlertDialogTrigger,
-    } from "@/components/ui/alert-dialog.jsx"; // Assuming alert-dialog is created
+    } from "@/components/ui/alert-dialog.jsx";
      import { useToast } from "@/components/ui/use-toast.jsx";
+     import { getApiUrl } from '@/config/api.js';
 
     const AdminPage = () => {
-      const [challenges, setChallenges] = useLocalStorage('challenges', []);
+      const [challenges, setChallenges] = useState([]);
+      const [isLoading, setIsLoading] = useState(true);
       const { toast } = useToast();
+
+      // Fetch challenges from backend
+      const fetchChallenges = async () => {
+        try {
+          const token = localStorage.getItem('fittrack_token');
+          if (!token) {
+            setIsLoading(false);
+            return;
+          }
+
+          const response = await fetch(getApiUrl('mongoChallenges'), {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            setChallenges(data.data || []);
+          } else {
+            console.error('Failed to fetch challenges:', data.message);
+          }
+        } catch (error) {
+          console.error('Error fetching challenges:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        fetchChallenges();
+      }, []);
 
       const handleCreateChallenge = (newChallenge) => {
         setChallenges(prevChallenges => [newChallenge, ...prevChallenges]);
       };
 
-      const handleDeleteChallenge = (challengeId) => {
-        setChallenges(prevChallenges => prevChallenges.filter(c => c.id !== challengeId));
-         toast({
-          title: "Challenge Deleted",
-          description: "The challenge has been successfully deleted.",
-        });
+      const handleDeleteChallenge = async (challengeId) => {
+        try {
+          const token = localStorage.getItem('fittrack_token');
+          if (!token) {
+            toast({
+              title: "Authentication Required",
+              description: "Please log in to delete challenges.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          const response = await fetch(getApiUrl('mongoDeleteChallenge')(challengeId), {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            setChallenges(prevChallenges => prevChallenges.filter(c => c.id !== challengeId));
+            toast({
+              title: "Challenge Deleted",
+              description: "The challenge has been successfully deleted.",
+            });
+          } else {
+            toast({
+              title: "Error Deleting Challenge",
+              description: data.message || "Failed to delete challenge.",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+          console.error('Error deleting challenge:', error);
+          toast({
+            title: "Network Error",
+            description: "Failed to connect to server. Please try again.",
+            variant: "destructive",
+          });
+        }
       };
-      
+
       // Placeholder for edit functionality
       const handleEditChallenge = (challengeId) => {
         toast({
@@ -66,7 +134,9 @@ import React from 'react';
                   <CardDescription>View, edit, or delete existing challenges.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {challenges.length === 0 ? (
+                  {isLoading ? (
+                    <p className="text-muted-foreground text-center py-4">Loading challenges...</p>
+                  ) : challenges.length === 0 ? (
                     <p className="text-muted-foreground text-center py-4">No challenges created yet.</p>
                   ) : (
                     <ul className="space-y-4">

@@ -31,6 +31,21 @@ def api_root(request):
                 'login': '/api/mongodb/login/',
                 'validate_token': '/api/mongodb/validate-token/',
             },
+            'mongodb_challenges': {
+                'list': '/api/mongodb/challenges/',
+                'create': '/api/mongodb/challenges/',
+                'detail': '/api/mongodb/challenges/<challenge_id>/',
+                'update': '/api/mongodb/challenges/<challenge_id>/',
+                'delete': '/api/mongodb/challenges/<challenge_id>/',
+                'join': '/api/mongodb/challenges/<challenge_id>/join/',
+                'leaderboard': '/api/mongodb/challenges/<challenge_id>/leaderboard/',
+            },
+            'mongodb_activities': {
+                'list': '/api/mongodb/activities/',
+                'log': '/api/mongodb/activities/',
+                'challenge_activities': '/api/mongodb/activities/challenge/<challenge_id>/',
+                'log_to_challenge': '/api/mongodb/activities/log/<challenge_id>/',
+            },
             'challenges': {
                 'list': '/api/challenges/',
                 'leaderboard': '/api/challenges/leaderboard/<challenge_id>/',
